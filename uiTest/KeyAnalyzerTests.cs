@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ui;
 using Xunit;
+using Xunit.Sdk;
 
 namespace uiTest
 {
@@ -69,6 +70,59 @@ namespace uiTest
         public void AnalyzeKeyStringWorks(string keyString, KeyDefinition expected)
         {
             var actual = KeyAnalyzer.AnalyzeKeyString(keyString);
+            Assert.Equal(expected, actual);
+        }
+
+        private static readonly KeyDefinition GuidKeyDefinition = new KeyDefinition
+        {
+            Separator = '-',
+            CharSet = KeyCharSetEnum.HexadecimalUpper,
+            FragmentCycle = "8,4,4,4",
+            KeyString = "0C9FAEDE13BB4B92ADD2696859ABA823"
+        };
+
+        public static readonly TheoryData<KeyDefinition, int> KeyDefinitionFixtures = new()
+        {
+            {GuidKeyDefinition, 0},
+            {GuidKeyDefinition with {KeyString = "x"}, 1},
+            {GuidKeyDefinition with {Separator = null}, 1},
+            {GuidKeyDefinition with {KeyString = ""}, 1},
+            {GuidKeyDefinition with {CharSet = null}, 1},
+            {GuidKeyDefinition with {CharSet = null, CustomCharset = "23423"}, 1},
+            {GuidKeyDefinition with {CustomCharset = "23423"}, 1},
+            {GuidKeyDefinition with {Separator = 'A'}, 2},
+            {GuidKeyDefinition with {FragmentCycle = null}, 1},
+            {GuidKeyDefinition with {FragmentCycle = "0"}, 1},
+            {GuidKeyDefinition with {FragmentCycle = "b"}, 1},
+        };
+
+        [Theory]
+        [MemberData(nameof(KeyDefinitionFixtures))]
+        public void ValidateKeyDefinitionDetectsErrors(KeyDefinition input, int expCount)
+        {
+            var actual = KeyAnalyzer.ValidateKeyDefinition(input);
+            if (actual.Count != expCount)
+                throw new XunitException($"Expected {expCount} errors but got: [\n  {string.Join("\n  ", actual)}\n]");
+        }
+
+        public static readonly TheoryData<string, int[]?> ParseFragmentCyclesFixtures = new()
+        {
+            {"1", new[] {1}},
+            {"1,2", new[] {1, 2}},
+            {"1, 2", new [] {1, 2}},
+            {"1 ,2", new [] {1, 2}},
+            {",1", null},
+            {"1,", null},
+            {"0", null},
+            {"1,b", null},
+            {"1,,2", null},
+        };
+
+        [Theory]
+        [MemberData(nameof(ParseFragmentCyclesFixtures))]
+        public void ParseFragmentCyclesWorks(string input, int[]? expected)
+        {
+            var actual = KeyAnalyzer.ParseFragmentCycles(input);
             Assert.Equal(expected, actual);
         }
     }
