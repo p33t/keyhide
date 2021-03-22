@@ -8,12 +8,17 @@ namespace ui
     {
         private const string SpaceChars = " -_.";
 
+        /// <summary>
+        /// Analyzes the given string for obvious fragments and preset character sets to achieve a key definition.
+        /// If no common ones are found then a 'custom' character set with no fragments is returned.
+        /// </summary>
         public static KeyDefinition AnalyzeKeyString(string keyString)
         {
+            //////////////////////////////////////// Need to convert to 'raw key string' inside a KeyDefinition
             return SpaceChars
-                .Select(ch => (char?) ch) // no separator option
-                .Prepend(null)
+                .Select(ch => (char?) ch)
                 // no separator option
+                .Prepend(null)
                 .SelectMany(sepOpt => Enum.GetValues<KeyCharSetEnum>()
                     .Select(charSet => new KeyDefinition
                     {
@@ -21,7 +26,6 @@ namespace ui
                         Separator = sepOpt,
                         CharSet = charSet
                     }))
-                .Select(IdentifyFragments)
                 .FirstOrDefault(def => ValidateKeyDefinition(def).Count == 0) ?? new KeyDefinition // last resort
             {
                 KeyString = keyString,
@@ -36,40 +40,37 @@ namespace ui
         {
             var errors = new List<string>();
 
-            if (string.IsNullOrEmpty(def.KeyString))
-                errors.Add("Need key string");
-            
             if (def.CharSet == null && string.IsNullOrEmpty(def.CustomCharset))
                 errors.Add("Need pre-defined or custom character set");
 
             if (def.CharSet != null && !string.IsNullOrEmpty(def.CustomCharset))
                 errors.Add("Cannot specify both pre-defined and custom character set");
-            
-            if (def.Separator == null && def.FragmentCycle != null)
-                errors.Add("Need a separator if dividing into fragments");
-            
-            if (def.Separator != null && def.FragmentCycle == null)
-                errors.Add("Need fragment cycles if dividing into fragments");
-            
+
             var charSet = def.CharSet != null
-                ? CharSetFor(def.CharSet!.Value) 
-                : def.CustomCharset != null 
-                    ? new HashSet<char>(def.CustomCharset) 
+                ? CharSetFor(def.CharSet!.Value)
+                : def.CustomCharset != null
+                    ? new HashSet<char>(def.CustomCharset)
                     : null;
-            
+
             if (def.Separator != null && charSet != null && charSet.Contains(def.Separator!.Value))
                 errors.Add("Character set contains the separator");
-            
-            var keyStringChars = new HashSet<char>(def.KeyString);
-            if (def.Separator != null && keyStringChars.Contains(def.Separator!.Value))
-                errors.Add("Key string contains the separator");
 
-            if (charSet != null && !keyStringChars.IsSubsetOf(charSet))
-                errors.Add("Key string contains characters not present in character set");
-            
-            if (def.FragmentCycle != null && ParseFragmentCycles(def.FragmentCycle) == null)
-                errors.Add("Fragment cycles could not be parsed.  Needs to be comma-separated numbers.  E.g. 3,5,3");
-            
+            var keyStringChars = new HashSet<char>(def.KeyString);
+            if (string.IsNullOrEmpty(def.KeyString))
+                errors.Add("Need key string");
+            else if (def.Separator != null && !keyStringChars.Contains(def.Separator!.Value))
+                errors.Add("Key string does not contain the separator");
+
+            if (charSet != null)
+            {
+                var sansSeparator = def.Separator == null
+                    ? keyStringChars
+                    : keyStringChars.Where(ch => ch != def.Separator).ToHashSet();
+                
+                if (!sansSeparator.IsSubsetOf(charSet))
+                    errors.Add("Key string contains characters not present in character set");
+            }
+
             return errors.AsReadOnly();
         }
 
@@ -83,31 +84,15 @@ namespace ui
             try
             {
                 var result = ss.Select(int.Parse).ToArray();
-                if (result.Length == 0) 
+                if (result.Length == 0)
                     return null;
-                
+
                 return result.Any(i => i <= 0) ? null : result;
             }
             catch (Exception)
             {
                 return null;
             }
-        }
-        
-        /// <summary>
-        /// Return a KeyDefinition with separators removed from the keyString and fragmentCycles identified.
-        /// E.G.  abc-def => abcdef & 3,3
-        /// </summary>
-        private static KeyDefinition IdentifyFragments(KeyDefinition def)
-        {
-            if (def.Separator == null)
-                return def;
-            var fragments = def.KeyString.Split(def.Separator!.Value);
-            return def with
-            {
-                KeyString = string.Join(null, fragments),
-                FragmentCycle = string.Join(',', fragments.Select(s => s.Length))
-            };
         }
 
         /// <summary>

@@ -25,19 +25,17 @@ namespace uiTest
             {
                 "7681aff2-843b-4003-803f-71c9231c9c6e", new KeyDefinition
                 {
-                    KeyString = "7681aff2843b4003803f71c9231c9c6e",
+                    KeyString = "7681aff2-843b-4003-803f-71c9231c9c6e",
                     Separator = '-',
                     CharSet = KeyCharSetEnum.HexadecimalLower,
-                    FragmentCycle = "8,4,4,4,12"
                 }
             },
             {
                 "7681AFF2 843B 4003 803F 71C9231C9C6E", new KeyDefinition
                 {
-                    KeyString = "7681AFF2843B4003803F71C9231C9C6E",
+                    KeyString = "7681AFF2 843B 4003 803F 71C9231C9C6E",
                     Separator = ' ',
                     CharSet = KeyCharSetEnum.HexadecimalUpper,
-                    FragmentCycle = "8,4,4,4,12"
                 }
             },
             {
@@ -50,10 +48,9 @@ namespace uiTest
             {
                 "09238.43299.32457", new KeyDefinition
                 {
-                    KeyString = "092384329932457",
+                    KeyString = "09238.43299.32457",
                     Separator = '.',
                     CharSet = KeyCharSetEnum.Numeric,
-                    FragmentCycle = "5,5,5"
                 }
             },
             {
@@ -77,23 +74,19 @@ namespace uiTest
         {
             Separator = '-',
             CharSet = KeyCharSetEnum.HexadecimalUpper,
-            FragmentCycle = "8,4,4,4",
-            KeyString = "0C9FAEDE13BB4B92ADD2696859ABA823"
+            KeyString = "2D5D0C89-7EEE-4EC9-A956-8E4918A035C8"
         };
 
         public static readonly TheoryData<KeyDefinition, int> KeyDefinitionFixtures = new()
         {
             {GuidKeyDefinition, 0},
-            {GuidKeyDefinition with {KeyString = "x"}, 1},
+            {GuidKeyDefinition with {KeyString = "x"}, 2},
             {GuidKeyDefinition with {Separator = null}, 1},
             {GuidKeyDefinition with {KeyString = ""}, 1},
             {GuidKeyDefinition with {CharSet = null}, 1},
             {GuidKeyDefinition with {CharSet = null, CustomCharset = "23423"}, 1},
             {GuidKeyDefinition with {CustomCharset = "23423"}, 1},
             {GuidKeyDefinition with {Separator = 'A'}, 2},
-            {GuidKeyDefinition with {FragmentCycle = null}, 1},
-            {GuidKeyDefinition with {FragmentCycle = "0"}, 1},
-            {GuidKeyDefinition with {FragmentCycle = "b"}, 1},
         };
 
         [Theory]
