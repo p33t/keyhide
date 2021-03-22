@@ -1,0 +1,64 @@
+@page "/2"
+@inject UiState UiState
+<h3>Key Analysis</h3>
+
+<p>
+    Enter the key that will be hidden among the grid of 'random' characters and select 'Analyze'.
+    Confirm the parameters are correct before proceeding to next step.
+</p>
+
+<form>
+    <div>
+        <label>Key:</label>
+        <input type="text" minlength="1" @onchange="KeyStringChanged"/>
+    </div>
+    <div>
+        <label>Fragment Separator:</label>
+        <input type="text" maxlength="1" value="@(UiState.KeyDefinition?.Separator)" 
+               @onchange="SeparatorChanged" disabled="@(UiState.KeyDefinition == null)"/>
+    </div>
+    @foreach (var error in _errors)
+    {
+        <p>@error</p>
+    }
+</form>
+
+@code {
+    private IList<string> _errors = new List<string>();
+
+    void KeyStringChanged(ChangeEventArgs evt)
+    {
+        var keyString = evt.Value as string;
+        KeyDefinition? def = null;
+        if (!string.IsNullOrEmpty(keyString))
+        {
+            if (UiState.KeyDefinition == null)
+    // first time key entered
+    // auto-analyze
+                def = KeyAnalyzer.AnalyzeKeyString(keyString);
+            else
+                 def = UiState.KeyDefinition with {KeyString = keyString};
+        }
+        UpdateKeyDefinition(def);
+    }
+
+    void SeparatorChanged(ChangeEventArgs evt)
+    {
+        if (UiState.KeyDefinition == null)
+            return;
+
+        char? separator;
+        if (evt.Value is string separatorStr)
+            separator = separatorStr[0];
+        else
+            separator = null;
+        UpdateKeyDefinition(UiState.KeyDefinition with {Separator = separator});
+    }
+
+    void UpdateKeyDefinition(KeyDefinition? def)
+    {
+        UiState.KeyDefinition = def;
+        _errors = def == null ? new List<string>() : KeyAnalyzer.ValidateKeyDefinition(def);
+    }
+
+}
