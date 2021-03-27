@@ -10,12 +10,29 @@
 <form>
     <div>
         <label>Key:</label>
-        <input type="text" minlength="1" @onchange="KeyStringChanged"/>
+        <input type="text" minlength="1" @onchange="KeyStringChanged"
+               value="@(UiState.KeyDefinition?.KeyString)"/>
     </div>
     <div>
         <label>Fragment Separator:</label>
-        <input type="text" maxlength="1" value="@(UiState.KeyDefinition?.Separator)" 
+        <input type="text" maxlength="1" value="@(UiState.KeyDefinition?.Separator)"
                @onchange="SeparatorChanged" disabled="@(UiState.KeyDefinition == null)"/>
+    </div>
+    <div>
+        <label>Pre-defined Characters:</label>
+        <select class="custom-select" @onchange="PredefinedCharsChanged" disabled="@(UiState.KeyDefinition == null)">
+            <option value="" selected="@(UiState.KeyDefinition?.CharSet == null)">(Custom)</option>
+            @foreach (var charSet in Enum.GetValues<KeyCharSetEnum>())
+            {
+                <option value="@charSet" selected="@(charSet == UiState.KeyDefinition?.CharSet)">@charSet</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Custom Characters:</label>
+        <input type="text" @onchange="CustomCharsChanged"
+               value="@(UiState.KeyDefinition?.CustomCharset)"
+               disabled="@(UiState.KeyDefinition == null)"/>
     </div>
     @foreach (var error in _errors)
     {
@@ -24,6 +41,7 @@
 </form>
 
 @code {
+    #nullable enable
     private IList<string> _errors = new List<string>();
 
     void KeyStringChanged(ChangeEventArgs evt)
@@ -37,7 +55,7 @@
     // auto-analyze
                 def = KeyAnalyzer.AnalyzeKeyString(keyString);
             else
-                 def = UiState.KeyDefinition with {KeyString = keyString};
+                def = UiState.KeyDefinition with {KeyString = keyString};
         }
         UpdateKeyDefinition(def);
     }
@@ -48,7 +66,7 @@
             return;
 
         char? separator;
-        if (evt.Value is string separatorStr)
+        if (evt.Value is string {Length: > 0 } separatorStr)
             separator = separatorStr[0];
         else
             separator = null;
@@ -59,6 +77,34 @@
     {
         UiState.KeyDefinition = def;
         _errors = def == null ? new List<string>() : KeyAnalyzer.ValidateKeyDefinition(def);
+    }
+
+    private void PredefinedCharsChanged(ChangeEventArgs evt)
+    {
+        if (UiState.KeyDefinition == null)
+            return;
+
+        KeyCharSetEnum? charSet;
+        if (evt.Value is string {Length: > 0 } charSetStr)
+            charSet = Enum.Parse<KeyCharSetEnum>(charSetStr);
+        else
+            charSet = null;
+        UpdateKeyDefinition(UiState.KeyDefinition with {CharSet = charSet});
+    }
+
+    private void CustomCharsChanged(ChangeEventArgs evt)
+    {
+        if (UiState.KeyDefinition == null)
+            return;
+
+        string? custom = null;
+        var charSetEnum = UiState.KeyDefinition?.CharSet;
+        if (evt.Value is string {Length: > 0 } str)
+        {
+            custom = str;
+            charSetEnum = null;
+        }
+        UpdateKeyDefinition(UiState.KeyDefinition with {CustomCharset = custom, CharSet = charSetEnum});
     }
 
 }
