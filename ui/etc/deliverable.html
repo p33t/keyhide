@@ -3,14 +3,38 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
     <title>Key Hide</title>
+    <style>
+        body {
+            background-color: linen;
+            font-family: sans-serif;
+        }
+        
+        td {
+            padding: .3em
+        }
+        
+        a {
+            text-decoration: none;
+        }
+        
+        .evenCell {
+            background-color: Gainsboro;
+        }
+        
+        .oddCell {
+            background-color: ghostwhite;
+        }
+    </style>    
 </head>
 <body>
 <h1>Key Hide</h1>
 <p>Select a series of cells from the grid to arrive at a secret key</p>
 <div>
     <!--suppress HtmlFormInputWithoutLabel -->
-    <input type="text" name="result" id="result" style="width: 30em" readonly="readonly" onclick="this.setSelectionRange(0, this.value.length)">
-    <input type="button" name="copyAndClose" value="Copy + Close Page" onclick="copyAndClose(); return false;">
+    <input type="text" hidden id="resultText" style="width: 30em" readonly="readonly" onclick="this.setSelectionRange(0, this.value.length)">
+    <input type="password" id="resultPassword" style="width: 30em" readonly="readonly">
+    <input type="button" name="copyAndClose" value="Copy" onclick="copy(); return false;">
+    <input type="button" id="showKey" value="Show/Hide" onclick="toggleShowKey(); return false;">
     <br>
     <input type="button" name="reset" value="Reset" onclick="resetSelection(); return false;">
     <input type="button" name="undo" value="Undo" onclick="undo(); return false;">
@@ -27,14 +51,15 @@ aasdofiakjhk
     const selection = [];
     document.body.onload = function () {
         const lineLength = lines[0].length;
-        let grid = "<table style='text-align: center; border-spacing: .2em'>";
+        let grid = "<table style='text-align: center; border-collapse: collapse'>";
         for (let ixLine = 0; ixLine < lines.length; ixLine++) {
             grid += "<tr>";
             const line = lines[ixLine];
             if (line.length !== lineLength) throw new Error(`Line #${ixLine + 1} has ${line.length} elements.  Expected ${lineLength}`);
             for (let ixChar = 0; ixChar < line.length; ixChar++) {
                 const char = line.charAt(ixChar);
-                grid += "<td>";
+                const isOddCell = (ixLine + ixChar) % 2 === 1;
+                grid += `<td class="${isOddCell ? 'oddCell' : 'evenCell'}">`;
                 let coordId = `${colName(ixChar + 1)}${ixLine + 1}`;
                 grid += `<a href='#' onclick='select(${ixLine}, ${ixChar}); return false;' title='${char}'>${coordId}</a>`;
                 grid += "</td>";
@@ -84,14 +109,23 @@ aasdofiakjhk
         return line.charAt(coord[1]);
     }
 
-    function copyAndClose() {
-        let txtResult = document.getElementById("result");
-        txtResult.select();
-        txtResult.setSelectionRange(0, txtResult.value.length);
+    function copy() {
+        // NOTE: Can only copy from visible text input (not a password or hidden text)
+        //       Also cannot close a window with code that was opened manually
+        let resultText = document.getElementById("resultText");
+        resultText.select();
+        resultText.setSelectionRange(0, resultText.value.length);
         document.execCommand("copy");
-        window.close();
     }
-
+    
+    function toggleShowKey() {
+        const resultText = document.getElementById("resultText");
+        const resultPassword = document.getElementById("resultPassword");
+        const isHidden = resultText.hidden;
+        resultText.hidden = !isHidden;
+        resultPassword.hidden = isHidden;
+    }
+    
     /** Return the series of chars plotting a deterministic path 'direct' between the two given coords */
     function trace(coordFrom, coordTo) {
         const ixLine = stepCloser(coordFrom[0], coordTo[0]);
@@ -120,8 +154,10 @@ aasdofiakjhk
             }
             lastCoord = coord;
         }
-        let txtResult = document.getElementById("result");
-        txtResult.value = str;
+        const resultText = document.getElementById("resultText");
+        const resultPassword = document.getElementById("resultPassword");
+        resultText.value = str;
+        resultPassword.value = str;
         // doesn't work
         // txtResult.setSelectionRange(0, str.length);
     }
