@@ -33,7 +33,7 @@
     <!--suppress HtmlFormInputWithoutLabel -->
     <input type="text" hidden id="resultText" style="width: 30em" readonly="readonly" onclick="this.setSelectionRange(0, this.value.length)">
     <input type="password" id="resultPassword" style="width: 30em" readonly="readonly">
-    <input type="button" name="copyAndClose" value="Copy" onclick="copy(); return false;">
+    <input type="button" value="Copy" onclick="copy(); return false;">
     <input type="button" id="showKey" value="Show/Hide" onclick="toggleShowKey(); return false;">
     <br>
     <input type="button" name="reset" value="Reset" onclick="resetSelection(); return false;">
@@ -112,10 +112,13 @@ aasdofiakjhk
     function copy() {
         // NOTE: Can only copy from visible text input (not a password or hidden text)
         //       Also cannot close a window with code that was opened manually
-        let resultText = document.getElementById("resultText");
+        const resultText = document.getElementById("resultText");
+        const isHidden = resultText.hidden;
+        if (isHidden) resultText.hidden = false;
         resultText.select();
         resultText.setSelectionRange(0, resultText.value.length);
         document.execCommand("copy");
+        if (isHidden) resultText.hidden = true;
     }
     
     function toggleShowKey() {
