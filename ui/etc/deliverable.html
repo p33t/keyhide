@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <title>Key Hide</title>
+</head>
+<body>
+<h1>Key Hide</h1>
+<p>Select a series of cells from the grid to arrive at a secret key</p>
+<div>
+    <!--suppress HtmlFormInputWithoutLabel -->
+    <input type="text" name="result" id="result" style="width: 30em" readonly="readonly" onclick="this.setSelectionRange(0, this.value.length)">
+    <input type="button" name="copyAndClose" value="Copy + Close Page" onclick="copyAndClose(); return false;">
+    <br>
+    <input type="button" name="reset" value="Reset" onclick="resetSelection(); return false;">
+    <input type="button" name="undo" value="Undo" onclick="undo(); return false;">
+</div>
+<p></p>
+<div id="grid-div"><table style="text-align: center; border-spacing: .2em"><tbody><tr><td><a href="#" onclick="select(0, 0); return false;" title="g">A1</a></td><td><a href="#" onclick="select(0, 1); return false;" title="k">B1</a></td><td><a href="#" onclick="select(0, 2); return false;" title="a">C1</a></td><td><a href="#" onclick="select(0, 3); return false;" title="c">D1</a></td><td><a href="#" onclick="select(0, 4); return false;" title="x">E1</a></td><td><a href="#" onclick="select(0, 5); return false;" title="c">F1</a></td><td><a href="#" onclick="select(0, 6); return false;" title="2">G1</a></td><td><a href="#" onclick="select(0, 7); return false;" title="9">H1</a></td><td><a href="#" onclick="select(0, 8); return false;" title="e">I1</a></td><td><a href="#" onclick="select(0, 9); return false;" title="a">J1</a></td><td><a href="#" onclick="select(0, 10); return false;" title="v">K1</a></td><td><a href="#" onclick="select(0, 11); return false;" title="j">L1</a></td><td><a href="#" onclick="select(0, 12); return false;" title="i">M1</a></td><td><a href="#" onclick="select(0, 13); return false;" title="v">N1</a></td><td><a href="#" onclick="select(0, 14); return false;" title="t">O1</a></td><td><a href="#" onclick="select(0, 15); return false;" title="d">P1</a></td></tr><tr><td><a href="#" onclick="select(1, 0); return false;" title="d">A2</a></td><td><a href="#" onclick="select(1, 1); return false;" title="7">B2</a></td><td><a href="#" onclick="select(1, 2); return false;" title="7">C2</a></td><td><a href="#" onclick="select(1, 3); return false;" title="6">D2</a></td><td><a href="#" onclick="select(1, 4); return false;" title="n">E2</a></td><td><a href="#" onclick="select(1, 5); return false;" title="q">F2</a></td><td><a href="#" onclick="select(1, 6); return false;" title="q">G2</a></td><td><a href="#" onclick="select(1, 7); return false;" title="x">H2</a></td><td><a href="#" onclick="select(1, 8); return false;" title="t">I2</a></td><td><a href="#" onclick="select(1, 9); return false;" title="y">J2</a></td><td><a href="#" onclick="select(1, 10); return false;" title="n">K2</a></td><td><a href="#" onclick="select(1, 11); return false;" title="4">L2</a></td><td><a href="#" onclick="select(1, 12); return false;" title="k">M2</a></td><td><a href="#" onclick="select(1, 13); return false;" title="o">N2</a></td><td><a href="#" onclick="select(1, 14); return false;" title="k">O2</a></td><td><a href="#" onclick="select(1, 15); return false;" title="d">P2</a></td></tr><tr><td><a href="#" onclick="select(2, 0); return false;" title="k">A3</a></td><td><a href="#" onclick="select(2, 1); return false;" title="j">B3</a></td><td><a href="#" onclick="select(2, 2); return false;" title="f">C3</a></td><td><a href="#" onclick="select(2, 3); return false;" title="5">D3</a></td><td><a href="#" onclick="select(2, 4); return false;" title="5">E3</a></td><td><a href="#" onclick="select(2, 5); return false;" title="4">F3</a></td><td><a href="#" onclick="select(2, 6); return false;" title="x">G3</a></td><td><a href="#" onclick="select(2, 7); return false;" title="t">H3</a></td><td><a href="#" onclick="select(2, 8); return false;" title="z">I3</a></td><td><a href="#" onclick="select(2, 9); return false;" title="0">J3</a></td><td><a href="#" onclick="select(2, 10); return false;" title="s">K3</a></td><td><a href="#" onclick="select(2, 11); return false;" title="d">L3</a></td><td><a href="#" onclick="select(2, 12); return false;" title="9">M3</a></td><td><a href="#" onclick="select(2, 13); return false;" title="i">N3</a></td><td><a href="#" onclick="select(2, 14); return false;" title="d">O3</a></td><td><a href="#" onclick="select(2, 15); return false;" title="d">P3</a></td></tr><tr><td><a href="#" onclick="select(3, 0); return false;" title="m">A4</a></td><td><a href="#" onclick="select(3, 1); return false;" title="9">B4</a></td><td><a href="#" onclick="select(3, 2); return false;" title="t">C4</a></td><td><a href="#" onclick="select(3, 3); return false;" title="m">D4</a></td><td><a href="#" onclick="select(3, 4); return false;" title="g">E4</a></td><td><a href="#" onclick="select(3, 5); return false;" title="5">F4</a></td><td><a href="#" onclick="select(3, 6); return false;" title="f">G4</a></td><td><a href="#" onclick="select(3, 7); return false;" title="s">H4</a></td><td><a href="#" onclick="select(3, 8); return false;" title="e">I4</a></td><td><a href="#" onclick="select(3, 9); return false;" title="b">J4</a></td><td><a href="#" onclick="select(3, 10); return false;" title="x">K4</a></td><td><a href="#" onclick="select(3, 11); return false;" title="c">L4</a></td><td><a href="#" onclick="select(3, 12); return false;" title="2">M4</a></td><td><a href="#" onclick="select(3, 13); return false;" title="y">N4</a></td><td><a href="#" onclick="select(3, 14); return false;" title="f">O4</a></td><td><a href="#" onclick="select(3, 15); return false;" title="h">P4</a></td></tr><tr><td><a href="#" onclick="select(4, 0); return false;" title="d">A5</a></td><td><a href="#" onclick="select(4, 1); return false;" title="4">B5</a></td><td><a href="#" onclick="select(4, 2); return false;" title="j">C5</a></td><td><a href="#" onclick="select(4, 3); return false;" title="l">D5</a></td><td><a href="#" onclick="select(4, 4); return false;" title="8">E5</a></td><td><a href="#" onclick="select(4, 5); return false;" title="z">F5</a></td><td><a href="#" onclick="select(4, 6); return false;" title="r">G5</a></td><td><a href="#" onclick="select(4, 7); return false;" title="g">H5</a></td><td><a href="#" onclick="select(4, 8); return false;" title="3">I5</a></td><td><a href="#" onclick="select(4, 9); return false;" title="f">J5</a></td><td><a href="#" onclick="select(4, 10); return false;" title="l">K5</a></td><td><a href="#" onclick="select(4, 11); return false;" title="e">L5</a></td><td><a href="#" onclick="select(4, 12); return false;" title="c">M5</a></td><td><a href="#" onclick="select(4, 13); return false;" title="d">N5</a></td><td><a href="#" onclick="select(4, 14); return false;" title="k">O5</a></td><td><a href="#" onclick="select(4, 15); return false;" title="z">P5</a></td></tr><tr><td><a href="#" onclick="select(5, 0); return false;" title="n">A6</a></td><td><a href="#" onclick="select(5, 1); return false;" title="j">B6</a></td><td><a href="#" onclick="select(5, 2); return false;" title="z">C6</a></td><td><a href="#" onclick="select(5, 3); return false;" title="v">D6</a></td><td><a href="#" onclick="select(5, 4); return false;" title="a">E6</a></td><td><a href="#" onclick="select(5, 5); return false;" title="f">F6</a></td><td><a href="#" onclick="select(5, 6); return false;" title="h">G6</a></td><td><a href="#" onclick="select(5, 7); return false;" title="k">H6</a></td><td><a href="#" onclick="select(5, 8); return false;" title="3">I6</a></td><td><a href="#" onclick="select(5, 9); return false;" title="h">J6</a></td><td><a href="#" onclick="select(5, 10); return false;" title="g">K6</a></td><td><a href="#" onclick="select(5, 11); return false;" title="i">L6</a></td><td><a href="#" onclick="select(5, 12); return false;" title="f">M6</a></td><td><a href="#" onclick="select(5, 13); return false;" title="0">N6</a></td><td><a href="#" onclick="select(5, 14); return false;" title="4">O6</a></td><td><a href="#" onclick="select(5, 15); return false;" title="0">P6</a></td></tr><tr><td><a href="#" onclick="select(6, 0); return false;" title="m">A7</a></td><td><a href="#" onclick="select(6, 1); return false;" title="i">B7</a></td><td><a href="#" onclick="select(6, 2); return false;" title="v">C7</a></td><td><a href="#" onclick="select(6, 3); return false;" title="i">D7</a></td><td><a href="#" onclick="select(6, 4); return false;" title="1">E7</a></td><td><a href="#" onclick="select(6, 5); return false;" title="e">F7</a></td><td><a href="#" onclick="select(6, 6); return false;" title="q">G7</a></td><td><a href="#" onclick="select(6, 7); return false;" title="9">H7</a></td><td><a href="#" onclick="select(6, 8); return false;" title="a">I7</a></td><td><a href="#" onclick="select(6, 9); return false;" title="d">J7</a></td><td><a href="#" onclick="select(6, 10); return false;" title="0">K7</a></td><td><a href="#" onclick="select(6, 11); return false;" title="j">L7</a></td><td><a href="#" onclick="select(6, 12); return false;" title="o">M7</a></td><td><a href="#" onclick="select(6, 13); return false;" title="u">N7</a></td><td><a href="#" onclick="select(6, 14); return false;" title="7">O7</a></td><td><a href="#" onclick="select(6, 15); return false;" title="d">P7</a></td></tr><tr><td><a href="#" onclick="select(7, 0); return false;" title="y">A8</a></td><td><a href="#" onclick="select(7, 1); return false;" title="x">B8</a></td><td><a href="#" onclick="select(7, 2); return false;" title="s">C8</a></td><td><a href="#" onclick="select(7, 3); return false;" title="y">D8</a></td><td><a href="#" onclick="select(7, 4); return false;" title="i">E8</a></td><td><a href="#" onclick="select(7, 5); return false;" title="x">F8</a></td><td><a href="#" onclick="select(7, 6); return false;" title="g">G8</a></td><td><a href="#" onclick="select(7, 7); return false;" title="i">H8</a></td><td><a href="#" onclick="select(7, 8); return false;" title="d">I8</a></td><td><a href="#" onclick="select(7, 9); return false;" title="7">J8</a></td><td><a href="#" onclick="select(7, 10); return false;" title="y">K8</a></td><td><a href="#" onclick="select(7, 11); return false;" title="t">L8</a></td><td><a href="#" onclick="select(7, 12); return false;" title="2">M8</a></td><td><a href="#" onclick="select(7, 13); return false;" title="3">N8</a></td><td><a href="#" onclick="select(7, 14); return false;" title="i">O8</a></td><td><a href="#" onclick="select(7, 15); return false;" title="s">P8</a></td></tr><tr><td><a href="#" onclick="select(8, 0); return false;" title="0">A9</a></td><td><a href="#" onclick="select(8, 1); return false;" title="u">B9</a></td><td><a href="#" onclick="select(8, 2); return false;" title="3">C9</a></td><td><a href="#" onclick="select(8, 3); return false;" title="h">D9</a></td><td><a href="#" onclick="select(8, 4); return false;" title="z">E9</a></td><td><a href="#" onclick="select(8, 5); return false;" title="9">F9</a></td><td><a href="#" onclick="select(8, 6); return false;" title="w">G9</a></td><td><a href="#" onclick="select(8, 7); return false;" title="h">H9</a></td><td><a href="#" onclick="select(8, 8); return false;" title="6">I9</a></td><td><a href="#" onclick="select(8, 9); return false;" title="k">J9</a></td><td><a href="#" onclick="select(8, 10); return false;" title="g">K9</a></td><td><a href="#" onclick="select(8, 11); return false;" title="1">L9</a></td><td><a href="#" onclick="select(8, 12); return false;" title="o">M9</a></td><td><a href="#" onclick="select(8, 13); return false;" title="j">N9</a></td><td><a href="#" onclick="select(8, 14); return false;" title="k">O9</a></td><td><a href="#" onclick="select(8, 15); return false;" title="v">P9</a></td></tr><tr><td><a href="#" onclick="select(9, 0); return false;" title="n">A10</a></td><td><a href="#" onclick="select(9, 1); return false;" title="9">B10</a></td><td><a href="#" onclick="select(9, 2); return false;" title="c">C10</a></td><td><a href="#" onclick="select(9, 3); return false;" title="r">D10</a></td><td><a href="#" onclick="select(9, 4); return false;" title="g">E10</a></td><td><a href="#" onclick="select(9, 5); return false;" title="l">F10</a></td><td><a href="#" onclick="select(9, 6); return false;" title="e">G10</a></td><td><a href="#" onclick="select(9, 7); return false;" title="y">H10</a></td><td><a href="#" onclick="select(9, 8); return false;" title="3">I10</a></td><td><a href="#" onclick="select(9, 9); return false;" title="f">J10</a></td><td><a href="#" onclick="select(9, 10); return false;" title="d">K10</a></td><td><a href="#" onclick="select(9, 11); return false;" title="e">L10</a></td><td><a href="#" onclick="select(9, 12); return false;" title="z">M10</a></td><td><a href="#" onclick="select(9, 13); return false;" title="g">N10</a></td><td><a href="#" onclick="select(9, 14); return false;" title="4">O10</a></td><td><a href="#" onclick="select(9, 15); return false;" title="2">P10</a></td></tr><tr><td><a href="#" onclick="select(10, 0); return false;" title="w">A11</a></td><td><a href="#" onclick="select(10, 1); return false;" title="p">B11</a></td><td><a href="#" onclick="select(10, 2); return false;" title="1">C11</a></td><td><a href="#" onclick="select(10, 3); return false;" title="2">D11</a></td><td><a href="#" onclick="select(10, 4); return false;" title="c">E11</a></td><td><a href="#" onclick="select(10, 5); return false;" title="2">F11</a></td><td><a href="#" onclick="select(10, 6); return false;" title="p">G11</a></td><td><a href="#" onclick="select(10, 7); return false;" title="s">H11</a></td><td><a href="#" onclick="select(10, 8); return false;" title="q">I11</a></td><td><a href="#" onclick="select(10, 9); return false;" title="n">J11</a></td><td><a href="#" onclick="select(10, 10); return false;" title="e">K11</a></td><td><a href="#" onclick="select(10, 11); return false;" title="h">L11</a></td><td><a href="#" onclick="select(10, 12); return false;" title="y">M11</a></td><td><a href="#" onclick="select(10, 13); return false;" title="t">N11</a></td><td><a href="#" onclick="select(10, 14); return false;" title="v">O11</a></td><td><a href="#" onclick="select(10, 15); return false;" title="z">P11</a></td></tr><tr><td><a href="#" onclick="select(11, 0); return false;" title="f">A12</a></td><td><a href="#" onclick="select(11, 1); return false;" title="6">B12</a></td><td><a href="#" onclick="select(11, 2); return false;" title="2">C12</a></td><td><a href="#" onclick="select(11, 3); return false;" title="j">D12</a></td><td><a href="#" onclick="select(11, 4); return false;" title="k">E12</a></td><td><a href="#" onclick="select(11, 5); return false;" title="c">F12</a></td><td><a href="#" onclick="select(11, 6); return false;" title="s">G12</a></td><td><a href="#" onclick="select(11, 7); return false;" title="w">H12</a></td><td><a href="#" onclick="select(11, 8); return false;" title="w">I12</a></td><td><a href="#" onclick="select(11, 9); return false;" title="w">J12</a></td><td><a href="#" onclick="select(11, 10); return false;" title="s">K12</a></td><td><a href="#" onclick="select(11, 11); return false;" title="7">L12</a></td><td><a href="#" onclick="select(11, 12); return false;" title="6">M12</a></td><td><a href="#" onclick="select(11, 13); return false;" title="j">N12</a></td><td><a href="#" onclick="select(11, 14); return false;" title="k">O12</a></td><td><a href="#" onclick="select(11, 15); return false;" title="2">P12</a></td></tr><tr><td><a href="#" onclick="select(12, 0); return false;" title="s">A13</a></td><td><a href="#" onclick="select(12, 1); return false;" title="0">B13</a></td><td><a href="#" onclick="select(12, 2); return false;" title="d">C13</a></td><td><a href="#" onclick="select(12, 3); return false;" title="u">D13</a></td><td><a href="#" onclick="select(12, 4); return false;" title="w">E13</a></td><td><a href="#" onclick="select(12, 5); return false;" title="m">F13</a></td><td><a href="#" onclick="select(12, 6); return false;" title="0">G13</a></td><td><a href="#" onclick="select(12, 7); return false;" title="c">H13</a></td><td><a href="#" onclick="select(12, 8); return false;" title="f">I13</a></td><td><a href="#" onclick="select(12, 9); return false;" title="y">J13</a></td><td><a href="#" onclick="select(12, 10); return false;" title="z">K13</a></td><td><a href="#" onclick="select(12, 11); return false;" title="9">L13</a></td><td><a href="#" onclick="select(12, 12); return false;" title="6">M13</a></td><td><a href="#" onclick="select(12, 13); return false;" title="o">N13</a></td><td><a href="#" onclick="select(12, 14); return false;" title="e">O13</a></td><td><a href="#" onclick="select(12, 15); return false;" title="k">P13</a></td></tr><tr><td><a href="#" onclick="select(13, 0); return false;" title="f">A14</a></td><td><a href="#" onclick="select(13, 1); return false;" title="l">B14</a></td><td><a href="#" onclick="select(13, 2); return false;" title="p">C14</a></td><td><a href="#" onclick="select(13, 3); return false;" title="v">D14</a></td><td><a href="#" onclick="select(13, 4); return false;" title="6">E14</a></td><td><a href="#" onclick="select(13, 5); return false;" title="n">F14</a></td><td><a href="#" onclick="select(13, 6); return false;" title="e">G14</a></td><td><a href="#" onclick="select(13, 7); return false;" title="z">H14</a></td><td><a href="#" onclick="select(13, 8); return false;" title="e">I14</a></td><td><a href="#" onclick="select(13, 9); return false;" title="n">J14</a></td><td><a href="#" onclick="select(13, 10); return false;" title="b">K14</a></td><td><a href="#" onclick="select(13, 11); return false;" title="z">L14</a></td><td><a href="#" onclick="select(13, 12); return false;" title="z">M14</a></td><td><a href="#" onclick="select(13, 13); return false;" title="y">N14</a></td><td><a href="#" onclick="select(13, 14); return false;" title="5">O14</a></td><td><a href="#" onclick="select(13, 15); return false;" title="j">P14</a></td></tr><tr><td><a href="#" onclick="select(14, 0); return false;" title="s">A15</a></td><td><a href="#" onclick="select(14, 1); return false;" title="7">B15</a></td><td><a href="#" onclick="select(14, 2); return false;" title="h">C15</a></td><td><a href="#" onclick="select(14, 3); return false;" title="r">D15</a></td><td><a href="#" onclick="select(14, 4); return false;" title="g">E15</a></td><td><a href="#" onclick="select(14, 5); return false;" title="g">F15</a></td><td><a href="#" onclick="select(14, 6); return false;" title="e">G15</a></td><td><a href="#" onclick="select(14, 7); return false;" title="v">H15</a></td><td><a href="#" onclick="select(14, 8); return false;" title="n">I15</a></td><td><a href="#" onclick="select(14, 9); return false;" title="a">J15</a></td><td><a href="#" onclick="select(14, 10); return false;" title="h">K15</a></td><td><a href="#" onclick="select(14, 11); return false;" title="l">L15</a></td><td><a href="#" onclick="select(14, 12); return false;" title="i">M15</a></td><td><a href="#" onclick="select(14, 13); return false;" title="2">N15</a></td><td><a href="#" onclick="select(14, 14); return false;" title="q">O15</a></td><td><a href="#" onclick="select(14, 15); return false;" title="1">P15</a></td></tr><tr><td><a href="#" onclick="select(15, 0); return false;" title="4">A16</a></td><td><a href="#" onclick="select(15, 1); return false;" title="4">B16</a></td><td><a href="#" onclick="select(15, 2); return false;" title="8">C16</a></td><td><a href="#" onclick="select(15, 3); return false;" title="7">D16</a></td><td><a href="#" onclick="select(15, 4); return false;" title="t">E16</a></td><td><a href="#" onclick="select(15, 5); return false;" title="b">F16</a></td><td><a href="#" onclick="select(15, 6); return false;" title="5">G16</a></td><td><a href="#" onclick="select(15, 7); return false;" title="1">H16</a></td><td><a href="#" onclick="select(15, 8); return false;" title="f">I16</a></td><td><a href="#" onclick="select(15, 9); return false;" title="o">J16</a></td><td><a href="#" onclick="select(15, 10); return false;" title="u">K16</a></td><td><a href="#" onclick="select(15, 11); return false;" title="5">L16</a></td><td><a href="#" onclick="select(15, 12); return false;" title="0">M16</a></td><td><a href="#" onclick="select(15, 13); return false;" title="s">N16</a></td><td><a href="#" onclick="select(15, 14); return false;" title="o">O16</a></td><td><a href="#" onclick="select(15, 15); return false;" title="9">P16</a></td></tr><tr><td><a href="#" onclick="select(16, 0); return false;" title="d">A17</a></td><td><a href="#" onclick="select(16, 1); return false;" title="2">B17</a></td><td><a href="#" onclick="select(16, 2); return false;" title="5">C17</a></td><td><a href="#" onclick="select(16, 3); return false;" title="d">D17</a></td><td><a href="#" onclick="select(16, 4); return false;" title="o">E17</a></td><td><a href="#" onclick="select(16, 5); return false;" title="1">F17</a></td><td><a href="#" onclick="select(16, 6); return false;" title="s">G17</a></td><td><a href="#" onclick="select(16, 7); return false;" title="n">H17</a></td><td><a href="#" onclick="select(16, 8); return false;" title="s">I17</a></td><td><a href="#" onclick="select(16, 9); return false;" title="v">J17</a></td><td><a href="#" onclick="select(16, 10); return false;" title="r">K17</a></td><td><a href="#" onclick="select(16, 11); return false;" title="s">L17</a></td><td><a href="#" onclick="select(16, 12); return false;" title="z">M17</a></td><td><a href="#" onclick="select(16, 13); return false;" title="a">N17</a></td><td><a href="#" onclick="select(16, 14); return false;" title="b">O17</a></td><td><a href="#" onclick="select(16, 15); return false;" title="c">P17</a></td></tr></tbody></table></div>
+
+<script type="application/javascript">
+    const lines = `
+aasdofiakjhk
+43l34;l4tlfk
+80feo89f9fad
+     `.trim().split('\n');
+    const selection = [];
+    document.body.onload = function () {
+        const lineLength = lines[0].length;
+        let grid = "<table style='text-align: center; border-spacing: .2em'>";
+        for (let ixLine = 0; ixLine < lines.length; ixLine++) {
+            grid += "<tr>";
+            const line = lines[ixLine];
+            if (line.length !== lineLength) throw new Error(`Line #${ixLine + 1} has ${line.length} elements.  Expected ${lineLength}`);
+            for (let ixChar = 0; ixChar < line.length; ixChar++) {
+                const char = line.charAt(ixChar);
+                grid += "<td>";
+                let coordId = `${colName(ixChar + 1)}${ixLine + 1}`;
+                grid += `<a href='#' onclick='select(${ixLine}, ${ixChar}); return false;' title='${char}'>${coordId}</a>`;
+                grid += "</td>";
+            }
+            grid += "</tr>";
+        }
+        grid += "</table>";
+        document.getElementById("grid-div").innerHTML = grid;
+        syncDisplay();
+    };
+
+    /** Excel-like column names.  E.g. A,B..Z,AA,AB..AZ,BA..ZZ,AAA,AAB */
+    function colName(position) {
+        // 0 before A, but show Z instead of A0
+        if (position === 0) return '';
+        const mod = position % 26;
+        let digit = String.fromCharCode((mod) + '@'.charCodeAt(0));
+        let nextMagnitude = Math.floor(position / 26);
+        if (mod === 0) {
+            digit = 'Z';
+            nextMagnitude--;
+        }
+        return colName(nextMagnitude) + digit;
+    }
+
+    function select(ixLine, ixChar) {
+        selection.push([ixLine, ixChar]);
+        syncDisplay();
+    }
+
+    function resetSelection() {
+        selection.length = 0;
+        syncDisplay();
+    }
+
+    /** Remove the most recently added coordinate from the selection */
+    function undo() {
+        if (selection.length > 0) {
+            selection.length = selection.length - 1;
+            syncDisplay();
+        }
+    }
+
+    /** Return the char at the given coordinate */
+    function charAtCoord(coord) {
+        const line = lines[coord[0]];
+        return line.charAt(coord[1]);
+    }
+
+    function copyAndClose() {
+        let txtResult = document.getElementById("result");
+        txtResult.select();
+        txtResult.setSelectionRange(0, txtResult.value.length);
+        document.execCommand("copy");
+        window.close();
+    }
+
+    /** Return the series of chars plotting a deterministic path 'direct' between the two given coords */
+    function trace(coordFrom, coordTo) {
+        const ixLine = stepCloser(coordFrom[0], coordTo[0]);
+        const ixChar = stepCloser(coordFrom[1], coordTo[1]);
+        const finished = ixLine === coordTo[0] && ixChar === coordTo[1];
+        const tail = finished ? charAtCoord(coordTo) : trace([ixLine, ixChar], coordTo);
+        return charAtCoord(coordFrom) + tail;
+    }
+
+    function stepCloser(from, to) {
+        if (from === to) return from;
+        if (from > to) return from - 1;
+        return from + 1;
+    }
+
+    function syncDisplay() {
+        let str = "";
+        let lastCoord;
+        for (const coord of selection) {
+            if (lastCoord) {
+                let leg = trace(lastCoord, coord);
+                str += leg.substring(1);
+            } else {
+                // the first coord
+                str = charAtCoord(coord);
+            }
+            lastCoord = coord;
+        }
+        let txtResult = document.getElementById("result");
+        txtResult.value = str;
+        // doesn't work
+        // txtResult.setSelectionRange(0, str.length);
+    }
+
+</script>
+
+</body></html>
