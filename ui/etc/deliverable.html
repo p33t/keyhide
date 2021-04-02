@@ -55,6 +55,8 @@ aasdofiakjhk
     const selection = [];
     document.body.onload = function () {
         const lineLength = LINES[0].length;
+        const maxSide = Math.max(lineLength, LINES.length);
+        const boxSize = maxSide > 20 ? 3 : maxSide > 10 ? 2 : 1;
         let grid = "<table style='text-align: center; border-collapse: collapse'>";
         for (let ixLine = 0; ixLine < LINES.length; ixLine++) {
             grid += "<tr>";
@@ -62,7 +64,7 @@ aasdofiakjhk
             if (line.length !== lineLength) throw new Error(`Line #${ixLine + 1} has ${line.length} elements.  Expected ${lineLength}`);
             for (let ixChar = 0; ixChar < line.length; ixChar++) {
                 const char = line.charAt(ixChar);
-                const isOddCell = (ixLine + ixChar) % 2 === 1;
+                const isOddCell = (Math.floor(ixLine / boxSize) % 2 + Math.floor(ixChar / boxSize) % 2) % 2 === 0;
                 grid += `<td class="${isOddCell ? 'oddCell' : 'evenCell'}">`;
                 let coordId = `${colName(ixChar + 1)}${ixLine + 1}`;
                 grid += `<a href='#' onclick='select(${ixLine}, ${ixChar}); return false;' title='${char}'>${coordId}</a>`;
