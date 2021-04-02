@@ -44,6 +44,7 @@
 
 <script type="application/javascript">
     const FRAGMENT_CYCLES = [3,2,3];
+    const SUBTRACT = 2;
     const SEPARATOR = ".";
     const PREFIX = "ABC.";
     const SUFFIX = ".XYZ";
@@ -163,6 +164,7 @@ aasdofiakjhk
             }
             lastCoord = coord;
         }
+        str = str.substring(0, str.length - SUBTRACT);
         
         //  fragment cycles
         if (FRAGMENT_CYCLES.length > 0) {
