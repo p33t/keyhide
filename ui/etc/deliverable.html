@@ -33,7 +33,7 @@
     <!--suppress HtmlFormInputWithoutLabel -->
     <input type="text" hidden id="resultText" style="width: 30em" readonly="readonly" onclick="this.setSelectionRange(0, this.value.length)">
     <input type="password" id="resultPassword" style="width: 30em" readonly="readonly">
-    <input type="button" value="Copy" onclick="copy(); return false;">
+    <input type="button" value="Copy + Reset" onclick="copy(); return false;">
     <input type="button" id="showKey" value="Show/Hide" onclick="toggleShowKey(); return false;">
     <br>
     <input type="button" name="reset" value="Reset" onclick="resetSelection(); return false;">
@@ -126,6 +126,7 @@ aasdofiakjhk
         resultText.setSelectionRange(0, resultText.value.length);
         document.execCommand("copy");
         if (isHidden) resultText.hidden = true;
+        resetSelection();
     }
     
     function toggleShowKey() {
