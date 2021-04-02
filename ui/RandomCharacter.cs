@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 #nullable enable
 
 namespace ui
@@ -11,17 +12,19 @@ namespace ui
         /// Generate random characters, preferring characters that are not already chosen already
         /// so as the result will have a reasonably random appearance spread.
         /// </summary>
-        public static IList<char> GenerateCharacters(IEnumerable<char> already, int targetSize, HashSet<char> charSet)
+        public static IList<char> GenerateCharacters(IEnumerable<char> already, int targetSize, HashSet<char> charSet,
+            IEnumerator<double> randomDoubles)
         {
             var spread = CalculateSpread(already, targetSize, charSet);
 
             var spreadSum = spread.Values.Sum();
             var spreadList = spread.ToList();
-            var random = new Random();
             var result = new List<char>();
             while (result.Count < targetSize)
             {
-                var slug = (float) (random.NextDouble() * spreadSum);
+                if (!randomDoubles.MoveNext())
+                    throw new Exception($"Have run out of random numbers at {result.Count}");
+                var slug = (float) (randomDoubles.Current * spreadSum);
                 var winner = ChooseWinner(spreadList, slug);
                 result.Add(winner);
             }
@@ -37,7 +40,8 @@ namespace ui
         /// <param name="charSet">Complete set of characters allowed</param>
         /// <param name="maxVsAvgOccurenceRatio">Max occurrences of a character as compared to avg occurrences.  Default 3.</param>
         /// <returns>Characters and their relative probability of being chosen</returns>
-        public static Dictionary<char, float> CalculateSpread(IEnumerable<char> already, int targetSize, HashSet<char> charSet, int maxVsAvgOccurenceRatio = 3)
+        public static Dictionary<char, float> CalculateSpread(IEnumerable<char> already, int targetSize,
+            HashSet<char> charSet, int maxVsAvgOccurenceRatio = 3)
         {
             var maxOccurrence = targetSize * maxVsAvgOccurenceRatio / (float) charSet.Count;
 
@@ -58,6 +62,7 @@ namespace ui
                     // have not reached max occurence yet
                     spread[c] = remaining;
                 }
+
                 // else, have already reached max occurrences for this char
             }
 
@@ -74,13 +79,13 @@ namespace ui
         {
             if (randomValue < 0f)
                 throw new ArgumentException("Value too small", nameof(randomValue));
-            
+
             var slug = randomValue;
             foreach (var (ch, remaining) in spreadList)
             {
                 if (remaining <= 0f)
                     throw new ArgumentException($"'{ch}' has relative probability {remaining}", nameof(spreadList));
-                    
+
                 slug -= remaining;
                 if (slug < 0f)
                     return ch;
