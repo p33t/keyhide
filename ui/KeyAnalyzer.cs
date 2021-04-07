@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace ui
@@ -36,15 +37,17 @@ namespace ui
         /// <summary>
         /// Returns a list of string describing any problems with the given KeyDefinition.
         /// </summary>
-        public static IList<string> ValidateKeyDefinition(KeyDefinition def)
+        public static IList<ValidationResult> ValidateKeyDefinition(KeyDefinition def)
         {
-            var errors = new List<string>();
+            var errors = new List<ValidationResult>();
 
             if (def.CharSet == null && string.IsNullOrEmpty(def.CustomCharset))
-                errors.Add("Need pre-defined or custom character set");
+                errors.Add(new ValidationResult("Need pre-defined or custom character set",
+                    new[] {nameof(KeyDefinition.CharSet), nameof(KeyDefinition.CustomCharset)}));
 
             if (def.CharSet != null && !string.IsNullOrEmpty(def.CustomCharset))
-                errors.Add("Cannot specify both pre-defined and custom character set");
+                errors.Add(new ValidationResult("Cannot specify both pre-defined and custom character set",
+                    new[] {nameof(KeyDefinition.CharSet), nameof(KeyDefinition.CustomCharset)}));
 
             var charSet = def.CharSet != null
                 ? CharSetFor(def.CharSet!.Value)
@@ -53,22 +56,25 @@ namespace ui
                     : null;
 
             if (def.Separator != null && charSet != null && charSet.Contains(def.Separator!.Value))
-                errors.Add("Character set contains the separator");
+                errors.Add(new ValidationResult("Character set contains the separator",
+                    new[] {nameof(KeyDefinition.Separator)}));
 
             var keyStringChars = new HashSet<char>(def.KeyString);
             if (string.IsNullOrEmpty(def.KeyString))
-                errors.Add("Need key string");
+                errors.Add(new ValidationResult("Need key string", new[] {nameof(KeyDefinition.KeyString)}));
             else if (def.Separator != null && !keyStringChars.Contains(def.Separator!.Value))
-                errors.Add("Key string does not contain the separator");
+                errors.Add(new ValidationResult("Key string does not contain the separator",
+                    new[] {nameof(KeyDefinition.Separator)}));
 
             if (charSet != null)
             {
                 var sansSeparator = def.Separator == null
                     ? keyStringChars
                     : keyStringChars.Where(ch => ch != def.Separator).ToHashSet();
-                
+
                 if (!sansSeparator.IsSubsetOf(charSet))
-                    errors.Add("Key string contains characters not present in character set");
+                    errors.Add(new ValidationResult("Key string contains characters not present in character set",
+                        new[] {nameof(KeyDefinition.KeyString)}));
             }
 
             return errors.AsReadOnly();

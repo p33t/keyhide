@@ -1,4 +1,5 @@
 @page "/2"
+@using System.ComponentModel.DataAnnotations
 @inject UiState UiState
 <h3>Key Analysis</h3>
 
@@ -9,9 +10,18 @@
 
 <form>
     <div>
+        <label>Prefix:</label>
+        @* This (or suffix) is causing Index out of range error.  Leave out for now 
+        <input type="text" @onchange="PrefixChanged" value="@(UiState.KeyDefinition?.Prefix)"> *@
+    </div>
+    <div>
         <label>Key:</label>
-        <input type="text" minlength="1" @onchange="KeyStringChanged"
-               value="@(UiState.KeyDefinition?.KeyString)"/>
+        <input type="text" @onchange="KeyStringChanged" value="@(UiState.KeyDefinition?.KeyString)"
+               minlength="1"/>
+    </div>
+    <div>
+        <label>Suffix:</label>
+        <input type="text" @onchange="SuffixChanged" value="@(UiState.KeyDefinition?.Suffix)">
     </div>
     <div>
         <label>Fragment Separator:</label>
@@ -60,6 +70,28 @@
         UpdateKeyDefinition(def);
     }
 
+    private void SuffixChanged(ChangeEventArgs evt)
+    {
+        if (UiState.KeyDefinition == null)
+            return;
+
+        string? suffix = null;
+        if (evt.Value is string {Length: > 0 } s)
+            suffix = s;
+        UpdateKeyDefinition(UiState.KeyDefinition with {Suffix = suffix});
+    }
+    
+    private void PrefixChanged(ChangeEventArgs evt)
+    {
+        if (UiState.KeyDefinition == null)
+            return;
+
+        string? prefix = null;
+        if (evt.Value is string {Length: > 0 } s)
+            prefix = s;
+        UpdateKeyDefinition(UiState.KeyDefinition with {Prefix = prefix});
+    }
+
     void SeparatorChanged(ChangeEventArgs evt)
     {
         if (UiState.KeyDefinition == null)
@@ -76,7 +108,13 @@
     void UpdateKeyDefinition(KeyDefinition? def)
     {
         UiState.KeyDefinition = def;
-        _errors = def == null ? new List<string>() : KeyAnalyzer.ValidateKeyDefinition(def);
+
+        var errors = new List<ValidationResult>();
+        if (def != null)
+            Validator.TryValidateObject(def, new ValidationContext(def), errors, true);
+
+        _errors = errors.Select(r => $"{string.Join(',', r.MemberNames)}: {r.ErrorMessage}")
+            .ToList();
     }
 
     private void PredefinedCharsChanged(ChangeEventArgs evt)
