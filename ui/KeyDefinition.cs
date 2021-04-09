@@ -5,17 +5,24 @@ namespace ui
 {
     public record KeyDefinition : IValidatableObject
     {
-        public string KeyString { get; init; } = string.Empty;
+        [Required]
+        public string KeyString { get; set; } = string.Empty;
 
-        public KeyCharSetEnum? CharSet { get; init; }
+        public KeyCharSetEnum? CharSet { get; set; }
 
-        public char? Separator { get; init; }
+        public char? Separator { get; set; }
+
+        public string SeparatorStr
+        {
+            get => Separator == null ? "" : Separator.ToString();
+            set => Separator = value.Length == 0 ? null : value[0];
+        }
         
-        public string? CustomCharset { get; init; }
+        public string? CustomCharset { get; set; }
         
-        public string? Prefix { get; init; }
+        public string? Prefix { get; set; }
 
-        public string? Suffix { get; init; }
+        public string? Suffix { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             return KeyAnalyzer.ValidateKeyDefinition((KeyDefinition) validationContext.ObjectInstance);

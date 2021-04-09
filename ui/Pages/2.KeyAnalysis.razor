@@ -1,6 +1,6 @@
 @page "/2"
-@using System.ComponentModel.DataAnnotations
 @inject UiState UiState
+@inject NavigationManager NavigationManager
 <h3>Key Analysis</h3>
 
 <p>
@@ -8,141 +8,87 @@
     Confirm the parameters are correct before proceeding to next step.
 </p>
 
-<form>
+@* NOTE: IValidatableObject error checking only occurs upon submit *@
+<EditForm Model="UiState.KeyDefinition" OnValidSubmit="@(e => NextScreen())">
     <div>
         <label>Prefix:</label>
-        @* This (or suffix) is causing Index out of range error.  Leave out for now 
-        <input type="text" @onchange="PrefixChanged" value="@(UiState.KeyDefinition?.Prefix)"> *@
+
+        <div>
+            <InputText @bind-Value="@(UiState.KeyDefinition.Prefix)"/>
+            <ValidationMessage For="@(() => UiState.KeyDefinition.Prefix)"/>
+        </div>
     </div>
     <div>
         <label>Key:</label>
-        <input type="text" @onchange="KeyStringChanged" value="@(UiState.KeyDefinition?.KeyString)"
-               minlength="1"/>
+        <div>
+            <InputText @bind-Value="UiState.KeyDefinition.KeyString" minlength="1"/>
+            <button @onclick="Analyze">Analyze</button>
+            <ValidationMessage For="@(() => UiState.KeyDefinition.KeyString)"/>
+        </div>
     </div>
     <div>
         <label>Suffix:</label>
-        <input type="text" @onchange="SuffixChanged" value="@(UiState.KeyDefinition?.Suffix)">
+        <div>
+            <InputText @bind-Value="UiState.KeyDefinition.Suffix"/>
+            <ValidationMessage For="@(() => UiState.KeyDefinition.Suffix)"/>
+        </div>
     </div>
     <div>
         <label>Fragment Separator:</label>
-        <input type="text" maxlength="1" value="@(UiState.KeyDefinition?.Separator)"
-               @onchange="SeparatorChanged" disabled="@(UiState.KeyDefinition == null)"/>
+        <div>
+            <InputText maxlength="1" @bind-Value="UiState.KeyDefinition.SeparatorStr"/>
+            <ValidationMessage For="@(() => UiState.KeyDefinition.Separator)"/>
+        </div>
     </div>
     <div>
         <label>Pre-defined Characters:</label>
-        <select class="custom-select" @onchange="PredefinedCharsChanged" disabled="@(UiState.KeyDefinition == null)">
-            <option value="" selected="@(UiState.KeyDefinition?.CharSet == null)">(Custom)</option>
-            @foreach (var charSet in Enum.GetValues<KeyCharSetEnum>())
-            {
-                <option value="@charSet" selected="@(charSet == UiState.KeyDefinition?.CharSet)">@charSet</option>
-            }
-        </select>
+        <div>
+            <select class="custom-select" @onchange="PredefinedCharsChanged">
+                <option value="" selected="@(UiState.KeyDefinition.CharSet == null)">(Custom)</option>
+                @foreach (var charSet in Enum.GetValues<KeyCharSetEnum>())
+                {
+                    <option value="@charSet" selected="@(charSet == UiState.KeyDefinition.CharSet)">@charSet</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => UiState.KeyDefinition.CharSet)"/>
+        </div>
     </div>
     <div>
         <label>Custom Characters:</label>
-        <input type="text" @onchange="CustomCharsChanged"
-               value="@(UiState.KeyDefinition?.CustomCharset)"
-               disabled="@(UiState.KeyDefinition == null)"/>
+        <div>
+            <InputText @bind-Value="UiState.KeyDefinition.CustomCharset"/>
+            <ValidationMessage For="@(() => UiState.KeyDefinition.CustomCharset)"/>
+        </div>
     </div>
-    @foreach (var error in _errors)
-    {
-        <p>@error</p>
-    }
-</form>
+    <DataAnnotationsValidator/>
+    <button type="submit">Next</button>
+</EditForm>
 
 @code {
-    #nullable enable
-    private IList<string> _errors = new List<string>();
-
-    void KeyStringChanged(ChangeEventArgs evt)
-    {
-        var keyString = evt.Value as string;
-        KeyDefinition? def = null;
-        if (!string.IsNullOrEmpty(keyString))
-        {
-            if (UiState.KeyDefinition == null)
-    // first time key entered
-    // auto-analyze
-                def = KeyAnalyzer.AnalyzeKeyString(keyString);
-            else
-                def = UiState.KeyDefinition with {KeyString = keyString};
-        }
-        UpdateKeyDefinition(def);
-    }
-
-    private void SuffixChanged(ChangeEventArgs evt)
-    {
-        if (UiState.KeyDefinition == null)
-            return;
-
-        string? suffix = null;
-        if (evt.Value is string {Length: > 0 } s)
-            suffix = s;
-        UpdateKeyDefinition(UiState.KeyDefinition with {Suffix = suffix});
-    }
-    
-    private void PrefixChanged(ChangeEventArgs evt)
-    {
-        if (UiState.KeyDefinition == null)
-            return;
-
-        string? prefix = null;
-        if (evt.Value is string {Length: > 0 } s)
-            prefix = s;
-        UpdateKeyDefinition(UiState.KeyDefinition with {Prefix = prefix});
-    }
-
-    void SeparatorChanged(ChangeEventArgs evt)
-    {
-        if (UiState.KeyDefinition == null)
-            return;
-
-        char? separator;
-        if (evt.Value is string {Length: > 0 } separatorStr)
-            separator = separatorStr[0];
-        else
-            separator = null;
-        UpdateKeyDefinition(UiState.KeyDefinition with {Separator = separator});
-    }
-
-    void UpdateKeyDefinition(KeyDefinition? def)
-    {
-        UiState.KeyDefinition = def;
-
-        var errors = new List<ValidationResult>();
-        if (def != null)
-            Validator.TryValidateObject(def, new ValidationContext(def), errors, true);
-
-        _errors = errors.Select(r => $"{string.Join(',', r.MemberNames)}: {r.ErrorMessage}")
-            .ToList();
-    }
+#nullable enable
 
     private void PredefinedCharsChanged(ChangeEventArgs evt)
     {
-        if (UiState.KeyDefinition == null)
-            return;
-
         KeyCharSetEnum? charSet;
         if (evt.Value is string {Length: > 0 } charSetStr)
             charSet = Enum.Parse<KeyCharSetEnum>(charSetStr);
         else
             charSet = null;
-        UpdateKeyDefinition(UiState.KeyDefinition with {CharSet = charSet});
+        UiState.KeyDefinition = UiState.KeyDefinition with {CharSet = charSet};
     }
 
-    private void CustomCharsChanged(ChangeEventArgs evt)
+    private void Analyze()
     {
-        if (UiState.KeyDefinition == null)
-            return;
+        var altDef = KeyAnalyzer.AnalyzeKeyString(UiState.KeyDefinition.KeyString);
+        UiState.KeyDefinition = altDef with {
+            Prefix = UiState.KeyDefinition.Prefix, 
+            Suffix = UiState.KeyDefinition.Suffix
+            };
+    }
 
-        string? custom = null;
-        var charSetEnum = UiState.KeyDefinition?.CharSet;
-        if (evt.Value is string {Length: > 0 } str)
-        {
-            custom = str;
-            charSetEnum = null;
-        }
-        UpdateKeyDefinition(UiState.KeyDefinition with {CustomCharset = custom, CharSet = charSetEnum});
+    private void NextScreen()
+    {
+        NavigationManager.NavigateTo("3");
     }
 
 }
