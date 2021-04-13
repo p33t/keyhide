@@ -4,65 +4,68 @@
 <h3>Key Analysis</h3>
 
 <p>
-    Enter the key that will be hidden among the grid of 'random' characters and select 'Analyze'.
+    Enter the key that will be hidden among the grid of random characters and select 'Analyze'.
     Confirm the parameters are correct before proceeding to next step.
 </p>
+<div class="main">
+    @* NOTE: IValidatableObject error checking only occurs upon submit *@
+    <EditForm Model="UiState.KeyDefinition" OnValidSubmit="@(e => NextScreen())">
+        <div class="form-fields">
+            <button type="submit" class="next-button btn btn-warning">Next</button>
+            <div class="form-field">
+                <label>Prefix:</label>
 
-@* NOTE: IValidatableObject error checking only occurs upon submit *@
-<EditForm Model="UiState.KeyDefinition" OnValidSubmit="@(e => NextScreen())">
-    <div>
-        <label>Prefix:</label>
-
-        <div>
-            <InputText @bind-Value="@(UiState.KeyDefinition.Prefix)"/>
-            <ValidationMessage For="@(() => UiState.KeyDefinition.Prefix)"/>
+                <div>
+                    <InputText @bind-Value="@(UiState.KeyDefinition.Prefix)"/>
+                    <ValidationMessage For="@(() => UiState.KeyDefinition.Prefix)"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Key:</label>
+                <div>
+                    <InputText @bind-Value="UiState.KeyDefinition.KeyString" minlength="1"/>
+                    <button @onclick="Analyze">Analyze</button>
+                    <ValidationMessage For="@(() => UiState.KeyDefinition.KeyString)"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Suffix:</label>
+                <div>
+                    <InputText @bind-Value="UiState.KeyDefinition.Suffix"/>
+                    <ValidationMessage For="@(() => UiState.KeyDefinition.Suffix)"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Fragment Separator:</label>
+                <div>
+                    <InputText maxlength="1" @bind-Value="UiState.KeyDefinition.SeparatorStr"/>
+                    <ValidationMessage For="@(() => UiState.KeyDefinition.Separator)"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Pre-defined Characters:</label>
+                <div>
+                    <select class="custom-select" @onchange="PredefinedCharsChanged">
+                        <option value="" selected="@(UiState.KeyDefinition.CharSet == null)">(Custom)</option>
+                        @foreach (var charSet in Enum.GetValues<KeyCharSetEnum>())
+                        {
+                            <option value="@charSet" selected="@(charSet == UiState.KeyDefinition.CharSet)">@charSet</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => UiState.KeyDefinition.CharSet)"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Custom Characters:</label>
+                <div>
+                    <InputText @bind-Value="UiState.KeyDefinition.CustomCharset"/>
+                    <ValidationMessage For="@(() => UiState.KeyDefinition.CustomCharset)"/>
+                </div>
+            </div>
         </div>
-    </div>
-    <div>
-        <label>Key:</label>
-        <div>
-            <InputText @bind-Value="UiState.KeyDefinition.KeyString" minlength="1"/>
-            <button @onclick="Analyze">Analyze</button>
-            <ValidationMessage For="@(() => UiState.KeyDefinition.KeyString)"/>
-        </div>
-    </div>
-    <div>
-        <label>Suffix:</label>
-        <div>
-            <InputText @bind-Value="UiState.KeyDefinition.Suffix"/>
-            <ValidationMessage For="@(() => UiState.KeyDefinition.Suffix)"/>
-        </div>
-    </div>
-    <div>
-        <label>Fragment Separator:</label>
-        <div>
-            <InputText maxlength="1" @bind-Value="UiState.KeyDefinition.SeparatorStr"/>
-            <ValidationMessage For="@(() => UiState.KeyDefinition.Separator)"/>
-        </div>
-    </div>
-    <div>
-        <label>Pre-defined Characters:</label>
-        <div>
-            <select class="custom-select" @onchange="PredefinedCharsChanged">
-                <option value="" selected="@(UiState.KeyDefinition.CharSet == null)">(Custom)</option>
-                @foreach (var charSet in Enum.GetValues<KeyCharSetEnum>())
-                {
-                    <option value="@charSet" selected="@(charSet == UiState.KeyDefinition.CharSet)">@charSet</option>
-                }
-            </select>
-            <ValidationMessage For="@(() => UiState.KeyDefinition.CharSet)"/>
-        </div>
-    </div>
-    <div>
-        <label>Custom Characters:</label>
-        <div>
-            <InputText @bind-Value="UiState.KeyDefinition.CustomCharset"/>
-            <ValidationMessage For="@(() => UiState.KeyDefinition.CustomCharset)"/>
-        </div>
-    </div>
-    <DataAnnotationsValidator/>
-    <button type="submit">Next</button>
-</EditForm>
+        <DataAnnotationsValidator/>
+    </EditForm>
+</div>
 
 @code {
 #nullable enable
