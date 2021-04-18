@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace ui
 {
     public class CoordGrid<T>
@@ -14,5 +18,10 @@ namespace ui
             get => _data[coord.ColIndex, coord.RowIndex];
             set => _data[coord.ColIndex, coord.RowIndex] = value;
         }
+
+        public IEnumerable<CellCoord> AllCoords() =>
+            Enumerable.Range(0, _data.GetLength(0))
+                .SelectMany(ixCol => Enumerable.Range(0, _data.GetLength(1))
+                    .Select(ixRow => CellCoord.Create(ixCol, ixRow)));
     }
 }
