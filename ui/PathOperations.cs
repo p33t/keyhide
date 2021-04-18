@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,7 +39,13 @@ namespace ui
             return ColName(nextMagnitude) + digit;
         }
 
-        /// Return the series of coords plotting a deterministic path 'direct' between the two given coords
+        /// Enumerate all the possible subsequent cells in a path that has passed through 'previous' and 'current'.
+        public static IEnumerable<CellCoord> Project(CellCoord previous, CellCoord current, int colCount, int rowCount)
+        {
+            throw new NotImplementedException("No need yet... this is an optimisation");
+        }
+        
+       /// Return the series of coords plotting a deterministic path 'direct' between the two given coords
         public static IEnumerable<CellCoord> Trace(CellCoord coordFrom, CellCoord coordTo)
         {
             if (coordFrom.Equals(coordTo))

@@ -4,6 +4,7 @@ namespace ui
 {
     public struct CellCoord
     {
+        public static readonly CellCoord Origin = Create(0, 0);
         public static CellCoord Create(int colIndex, int rowIndex) => new()
         {
             ColIndex = colIndex,

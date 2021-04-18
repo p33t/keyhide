@@ -16,7 +16,7 @@ namespace uiTest
             _testOutputHelper = testOutputHelper;
         }
 
-        [Fact]
+        [Fact(Skip = "Not generating ATM")]
         public void ScratchMethod()
         {
             // 1Password Secret Key
@@ -46,17 +46,6 @@ namespace uiTest
                 var segment = chars.Skip(index).Take(24);
                 _testOutputHelper.WriteLine(string.Join(null, segment));
             }      
-        }
-
-        [Fact]
-        public void McScratch()
-        {
-            _testOutputHelper.WriteLine("Random floats:");
-            var rand = new Random();
-            for (int i = 0; i < 100; i++)
-            {
-                _testOutputHelper.WriteLine($"{i}: {rand.NextDouble()}");
-            }
         }
     }
 }
