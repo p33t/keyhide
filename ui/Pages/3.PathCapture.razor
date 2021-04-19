@@ -1,13 +1,61 @@
 @page "/3"
+@inject UiState _uiState
+@inject NavigationManager _navigationManager
 <h3>Path Capture</h3>
 <p>
     Define how large your grid should be and choose a series of cells that will define a path to inlay your key.
 </p>
 
-<div>
+<div class="main">
+    @* NOTE: IValidatableObject error checking only occurs upon submit *@
+    <EditForm Model="_uiState.PathDefinition" OnValidSubmit="@(e => NextScreen())">
+        <div class="form-fields">
+            <button type="submit" class="next-button btn btn-warning">Next</button>
+            <div class="form-field">
+                <label>Columns:</label>
+                <div>
+                    <InputNumber @bind-Value="@(_uiState.PathDefinition.ColCount)"/>
+                    <ValidationMessage For="@(() => _uiState.PathDefinition.ColCount)"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Rows:</label>
+                <div>
+                    <InputNumber @bind-Value="@(_uiState.PathDefinition.RowCount)"/>
+                    <ValidationMessage For="@(() => _uiState.PathDefinition.RowCount)"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Rows:</label>
+                <div>
+                    @if (_uiState.PathDefinition.Coords.Any())
+                    {
+                        @(string.Join(' ', _uiState.PathDefinition.Coords))<br/>
+                    }
+                    else
+                    {
+                        <text>(Empty)</text><br/>
+                    }
+                    <button @onclick="Reset">Reset</button>
+                    <ValidationMessage For="@(() => _uiState.PathDefinition.Coords)"/>
+                </div>
+            </div>
+            
+        </div>
+        <DataAnnotationsValidator/>
+    </EditForm>
 </div>
 
 
 @code {
+
+    private void Reset()
+    {
+        _uiState.PathDefinition.Coords = Array.Empty<CellCoord>();
+    }
     
+    private void NextScreen()
+    {
+        
+    }
 }

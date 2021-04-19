@@ -11,7 +11,7 @@
     @* NOTE: IValidatableObject error checking only occurs upon submit *@
     <EditForm Model="_uiState.KeyDefinition" OnValidSubmit="@(e => NextScreen())">
         <div class="form-fields">
-            <input type="button" class="btn" disabled="@UndoDisabled" value="Undo" @onclick="Undo"/>
+            <button @onclick="Undo">Undo</button>
             <button type="submit" class="next-button btn btn-warning">Next</button>
             <div class="form-field">
                 <label>Prefix:</label>
