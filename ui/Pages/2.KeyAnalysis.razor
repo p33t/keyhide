@@ -1,6 +1,6 @@
 @page "/2"
-@inject UiState UiState
-@inject NavigationManager NavigationManager
+@inject UiState _uiState
+@inject NavigationManager _navigationManager
 <h3>Key Analysis</h3>
 
 <p>
@@ -9,57 +9,58 @@
 </p>
 <div class="main">
     @* NOTE: IValidatableObject error checking only occurs upon submit *@
-    <EditForm Model="UiState.KeyDefinition" OnValidSubmit="@(e => NextScreen())">
+    <EditForm Model="_uiState.KeyDefinition" OnValidSubmit="@(e => NextScreen())">
         <div class="form-fields">
+            <input type="button" class="btn" disabled="@UndoDisabled" value="Undo" @onclick="Undo"/>
             <button type="submit" class="next-button btn btn-warning">Next</button>
             <div class="form-field">
                 <label>Prefix:</label>
 
                 <div>
-                    <InputText @bind-Value="@(UiState.KeyDefinition.Prefix)"/>
-                    <ValidationMessage For="@(() => UiState.KeyDefinition.Prefix)"/>
+                    <InputText @bind-Value="@(_uiState.KeyDefinition.Prefix)"/>
+                    <ValidationMessage For="@(() => _uiState.KeyDefinition.Prefix)"/>
                 </div>
             </div>
             <div class="form-field">
                 <label>Key:</label>
                 <div>
-                    <InputText @bind-Value="UiState.KeyDefinition.KeyString" minlength="1"/>
+                    <InputText @bind-Value="_uiState.KeyDefinition.KeyString" minlength="1"/>
                     <button @onclick="Analyze">Analyze</button>
-                    <ValidationMessage For="@(() => UiState.KeyDefinition.KeyString)"/>
+                    <ValidationMessage For="@(() => _uiState.KeyDefinition.KeyString)"/>
                 </div>
             </div>
             <div class="form-field">
                 <label>Suffix:</label>
                 <div>
-                    <InputText @bind-Value="UiState.KeyDefinition.Suffix"/>
-                    <ValidationMessage For="@(() => UiState.KeyDefinition.Suffix)"/>
+                    <InputText @bind-Value="_uiState.KeyDefinition.Suffix"/>
+                    <ValidationMessage For="@(() => _uiState.KeyDefinition.Suffix)"/>
                 </div>
             </div>
             <div class="form-field">
                 <label>Fragment Separator:</label>
                 <div>
-                    <InputText maxlength="1" @bind-Value="UiState.KeyDefinition.SeparatorStr"/>
-                    <ValidationMessage For="@(() => UiState.KeyDefinition.Separator)"/>
+                    <InputText maxlength="1" @bind-Value="_uiState.KeyDefinition.SeparatorStr"/>
+                    <ValidationMessage For="@(() => _uiState.KeyDefinition.Separator)"/>
                 </div>
             </div>
             <div class="form-field">
                 <label>Pre-defined Characters:</label>
                 <div>
                     <select class="custom-select" @onchange="PredefinedCharsChanged">
-                        <option value="" selected="@(UiState.KeyDefinition.CharSet == null)">(Custom)</option>
+                        <option value="" selected="@(_uiState.KeyDefinition.CharSet == null)">(Custom)</option>
                         @foreach (var charSet in Enum.GetValues<KeyCharSetEnum>())
                         {
-                            <option value="@charSet" selected="@(charSet == UiState.KeyDefinition.CharSet)">@charSet</option>
+                            <option value="@charSet" selected="@(charSet == _uiState.KeyDefinition.CharSet)">@charSet</option>
                         }
                     </select>
-                    <ValidationMessage For="@(() => UiState.KeyDefinition.CharSet)"/>
+                    <ValidationMessage For="@(() => _uiState.KeyDefinition.CharSet)"/>
                 </div>
             </div>
             <div class="form-field">
                 <label>Custom Characters:</label>
                 <div>
-                    <InputText @bind-Value="UiState.KeyDefinition.CustomCharset"/>
-                    <ValidationMessage For="@(() => UiState.KeyDefinition.CustomCharset)"/>
+                    <InputText @bind-Value="_uiState.KeyDefinition.CustomCharset"/>
+                    <ValidationMessage For="@(() => _uiState.KeyDefinition.CustomCharset)"/>
                 </div>
             </div>
         </div>
@@ -70,6 +71,10 @@
 @code {
 #nullable enable
 
+    private bool UndoDisabled => _uiState.ValidKeyDefinition == null;
+    // Causes 'Undo' become available only after field on-change:
+    // || _uiState.KeyDefinition.Equals(_uiState.ValidKeyDefinition)
+
     private void PredefinedCharsChanged(ChangeEventArgs evt)
     {
         KeyCharSetEnum? charSet;
@@ -77,21 +82,29 @@
             charSet = Enum.Parse<KeyCharSetEnum>(charSetStr);
         else
             charSet = null;
-        UiState.KeyDefinition = UiState.KeyDefinition with {CharSet = charSet};
+        _uiState.KeyDefinition = _uiState.KeyDefinition with {CharSet = charSet};
     }
 
     private void Analyze()
     {
-        var altDef = KeyAnalyzer.AnalyzeKeyString(UiState.KeyDefinition.KeyString);
-        UiState.KeyDefinition = altDef with {
-            Prefix = UiState.KeyDefinition.Prefix, 
-            Suffix = UiState.KeyDefinition.Suffix
+        var altDef = KeyAnalyzer.AnalyzeKeyString(_uiState.KeyDefinition.KeyString);
+        _uiState.KeyDefinition = altDef with {
+            Prefix = _uiState.KeyDefinition.Prefix, 
+            Suffix = _uiState.KeyDefinition.Suffix
             };
     }
 
     private void NextScreen()
     {
-        NavigationManager.NavigateTo("3");
+        _uiState.ValidKeyDefinition = _uiState.KeyDefinition.DeepCopy();
+        _navigationManager.NavigateTo("3");
+    }
+
+    private void Undo()
+    {
+        Console.WriteLine("Undo clicked " + DateTime.Now);
+        if (_uiState.ValidKeyDefinition != null)
+            _uiState.KeyDefinition = _uiState.ValidKeyDefinition.DeepCopy();
     }
 
 }

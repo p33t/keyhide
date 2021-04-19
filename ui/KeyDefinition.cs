@@ -14,7 +14,7 @@ namespace ui
 
         public string SeparatorStr
         {
-            get => Separator == null ? "" : Separator.ToString();
+            get => Separator?.ToString() ?? string.Empty;
             set => Separator = value.Length == 0 ? null : value[0];
         }
         
@@ -26,6 +26,13 @@ namespace ui
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             return KeyAnalyzer.ValidateKeyDefinition((KeyDefinition) validationContext.ObjectInstance);
+        }
+
+        /// Creates a copy that can be modified independently of this instance
+        public KeyDefinition DeepCopy()
+        {
+            // no mutable properties ATM
+            return this with { };
         }
     }
 }
