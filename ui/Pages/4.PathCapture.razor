@@ -1,32 +1,18 @@
-@page "/3"
+@page "/4"
 @inject UiState _uiState
 @inject NavigationManager _navigationManager
 <h3>Path Capture</h3>
 <p>
-    Define how large your grid should be and choose a series of cells that will define a path to inlay your key.
+    Choose a series of cells that will define a path to inlay your key.
 </p>
 
 <div class="main">
     @* NOTE: IValidatableObject error checking only occurs upon submit *@
-    <EditForm Model="_uiState.PathDefinition" OnValidSubmit="@(e => NextScreen())">
+    <EditForm Model="_uiState.PathDefinition" OnValidSubmit="@NextScreen">
         <div class="form-fields">
             <button type="submit" class="next-button btn btn-warning">Next</button>
             <div class="form-field">
-                <label>Columns:</label>
-                <div>
-                    <InputNumber @bind-Value="@(_uiState.PathDefinition.ColCount)"/>
-                    <ValidationMessage For="@(() => _uiState.PathDefinition.ColCount)"/>
-                </div>
-            </div>
-            <div class="form-field">
-                <label>Rows:</label>
-                <div>
-                    <InputNumber @bind-Value="@(_uiState.PathDefinition.RowCount)"/>
-                    <ValidationMessage For="@(() => _uiState.PathDefinition.RowCount)"/>
-                </div>
-            </div>
-            <div class="form-field">
-                <label>Rows:</label>
+                <label>Path:</label>
                 <div>
                     @if (_uiState.PathDefinition.Coords.Any())
                     {
@@ -34,28 +20,38 @@
                     }
                     else
                     {
-                        <text>(Empty)</text><br/>
+                        <text>(Empty)</text>
+                        <br/>
                     }
                     <button @onclick="Reset">Reset</button>
                     <ValidationMessage For="@(() => _uiState.PathDefinition.Coords)"/>
                 </div>
             </div>
-            
+
         </div>
         <DataAnnotationsValidator/>
     </EditForm>
+    <GridDisplay Grid="Grid" OnCellSelect="OnCellSelect"/>
 </div>
 
 
 @code {
+    private CoordGrid<DisplayCell>? Grid { get; set; }
 
     private void Reset()
     {
         _uiState.PathDefinition.Coords = Array.Empty<CellCoord>();
+
+        Grid = new CoordGrid<DisplayCell>(10, 10);
     }
-    
+
+    private void OnCellSelect(CellCoord coord)
+    {
+        Console.WriteLine($"Clicked {coord}");
+    }
+
     private void NextScreen()
     {
-        
     }
+
 }

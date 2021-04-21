@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,6 +12,9 @@ namespace ui
             _data = new T[colCount, rowCount];
         }
 
+        public int ColCount => _data.GetLength(0);
+        public int RowCount => _data.GetLength(1);
+        
         public T this[CellCoord coord]
         {
             get => _data[coord.ColIndex, coord.RowIndex];

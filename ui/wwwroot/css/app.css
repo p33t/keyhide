@@ -85,3 +85,11 @@ a, .btn-link {
     background: linear-gradient(rgba(0,0,0,0) 40%, rgba(0,0,0,0.4) 80%);
     padding: 1.5rem !important;
 }
+
+.evenCell {
+    background-color: Gainsboro;
+}
+
+.oddCell {
+    background-color: ghostwhite;
+}

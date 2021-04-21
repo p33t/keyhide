@@ -1,0 +1,73 @@
+@page "/3"
+@inject UiState _uiState
+@inject NavigationManager _navigationManager
+<h3>Grid Setup</h3>
+<p>
+    Define how large your grid should be. Larger is more secure but also more difficult to display and use.
+</p>
+
+<div class="main">
+    <EditForm Model="_uiState.GridSetup" OnValidSubmit="@NextScreen">
+        <div class="form-fields">
+            <button type="submit" class="next-button btn btn-warning">Next</button>
+            <div class="form-field">
+                <label>Columns:</label>
+                <div>
+                    @* Can't bind value and listen for change *@
+                    @* <InputNumber @bind-Value="_uiState.GridSetup.ColCount" @OnChange="ColCountChange"/> *@
+                    <input type="number" value="@(_uiState.GridSetup.ColCount)" @onchange="ColCountChange" 
+                           min="10" max="100"/>
+                    <ValidationMessage For="@(() => _uiState.GridSetup.ColCount)"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Rows:</label>
+                <div>
+                    <input type="number" value="@(_uiState.GridSetup.RowCount)" @onchange="RowCountChange" 
+                           min="10" max="100"/>
+                    <ValidationMessage For="@(() => _uiState.GridSetup.RowCount)"/>
+                </div>
+            </div>
+        </div>
+        <DataAnnotationsValidator/>
+    </EditForm>
+    <GridDisplay Grid="Grid"/>
+</div>
+
+
+@code {
+    private CoordGrid<DisplayCell> Grid { get; set; } = new(GridSetupModel.DefaultColCount, GridSetupModel.DefaultRowCount);
+
+    private void Reset()
+    {
+        int SafeCount(int i) => Math.Max(Math.Min(i, 100), 10);
+        var colCount = SafeCount(_uiState.GridSetup.ColCount);
+        var rowCount = SafeCount(_uiState.GridSetup.RowCount);
+        Grid = new CoordGrid<DisplayCell>(colCount, rowCount);
+    }
+
+    private void NextScreen()
+    {
+        _uiState.ValidGridSetup = _uiState.GridSetup.DeepCopy();
+        _navigationManager.NavigateTo("4");
+    }
+
+    private void ColCountChange(ChangeEventArgs evt)
+    {
+        if (int.TryParse((string) evt.Value!, out var colCount)&& _uiState.GridSetup.ColCount != colCount)
+        {
+            _uiState.GridSetup.ColCount = colCount;
+            Reset();
+        }
+    }
+    
+    private void RowCountChange(ChangeEventArgs evt)
+    {
+        if (int.TryParse((string) evt.Value!, out var colCount)&& _uiState.GridSetup.RowCount != colCount)
+        {
+            _uiState.GridSetup.RowCount = colCount;
+            Reset();
+        }
+    }
+
+}
