@@ -34,7 +34,7 @@ namespace uiTest
                 keyString);
             Assert.Equal(expAvailable, actual);
         }
-        
+
         [Theory]
         [InlineData(0, "")]
         [InlineData(1, "A")]
@@ -49,36 +49,43 @@ namespace uiTest
 
         public static TheoryData<CellCoord[]> TraceFixtures => new()
         {
-            new []
+            new[]
             {
-                CellCoord.Create(0,0)
+                CellCoord.Create(0, 0)
             },
-            new []
+            new[]
             {
-                CellCoord.Create(0,0),
-                CellCoord.Create(1,1)
+                CellCoord.Create(0, 0),
+                CellCoord.Create(1, 1)
             },
-            new []
+            new[]
             {
-                CellCoord.Create(0,0),
-                CellCoord.Create(0,1)
+                CellCoord.Create(0, 0),
+                CellCoord.Create(0, 1)
             },
-            new []
+            new[]
             {
-                CellCoord.Create(0,0),
-                CellCoord.Create(1,0)
+                CellCoord.Create(0, 0),
+                CellCoord.Create(1, 0)
             },
-            new []
+            new[]
             {
-                CellCoord.Create(0,0),
-                CellCoord.Create(1,1),
-                CellCoord.Create(2,1)
+                CellCoord.Create(0, 0),
+                CellCoord.Create(1, 1),
+                CellCoord.Create(2, 1)
             },
-            new []
+            new[]
             {
-                CellCoord.Create(2,1),
-                CellCoord.Create(1,0),
-                CellCoord.Create(0,0)
+                CellCoord.Create(2, 1),
+                CellCoord.Create(1, 0),
+                CellCoord.Create(0, 0)
+            },
+            new[]
+            {
+                CellCoord.Create(3, 3),
+                CellCoord.Create(2, 3),
+                CellCoord.Create(1, 3),
+                CellCoord.Create(0, 3),
             }
         };
 
