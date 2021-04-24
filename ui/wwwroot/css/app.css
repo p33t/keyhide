@@ -86,10 +86,31 @@ a, .btn-link {
     padding: 1.5rem !important;
 }
 
-.evenCell {
+td {
+    padding: .3em
+}
+
+a {
+    text-decoration: none;
+}
+
+td.evenCell {
     background-color: Gainsboro;
 }
 
-.oddCell {
+td.oddCell {
     background-color: ghostwhite;
+}
+
+td.occupied {
+    background-color: white;
+}
+
+td.available a {
+    color: forestgreen;
+    font-weight: bold;
+}
+
+td.unavailable a {
+    color: #b21f2d;
 }

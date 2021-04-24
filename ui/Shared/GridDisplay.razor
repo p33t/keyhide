@@ -7,8 +7,19 @@
                 @for (var ixCol = 0; ixCol < Grid.ColCount; ixCol++)
                 {
                     var coord = CellCoord.Create(ixCol, ixRow);
-                    var isOddCell = ((ixRow / BoxSize) % 2 + (ixCol / BoxSize) % 2) % 2 == 0;
-                    <td @key=coord class="@(isOddCell ? "oddCell" : "evenCell")">
+                    var displayCell = Grid[coord];
+                    var occupied = displayCell.Content == null
+                        ? "unoccupied"
+                        : "occupied";
+                    var available = displayCell.IsAvailable == null
+                        ? ""
+                        : displayCell.IsAvailable.Value
+                            ? "available"
+                            : "unavailable";
+                    var isOddCell = ((ixRow / BoxSize) % 2 + (ixCol / BoxSize) % 2) % 2 == 0
+                        ? "oddCell"
+                        : "evenCell";
+                    <td @key=coord class="@isOddCell @occupied @available">
                         <a href='' @onclick="() => CellClick(coord)" @onclick:preventDefault>@coord</a>
                     </td>
                 }
@@ -33,7 +44,7 @@
     {
         await OnCellSelect.InvokeAsync(coord);
     }
-    
+
     [Parameter]
     public CoordGrid<DisplayCell>? Grid { get; set; }
 

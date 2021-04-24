@@ -11,9 +11,8 @@ namespace ui
 
         public GridSetupModel? ValidGridSetup { get; set; }
 
-        public PathDefinition PathDefinition { get; set; } = new PathDefinition
-        {
-            Coords = new[] {CellCoord.Origin, CellCoord.Origin}
-        };
+        public PathDefinition PathDefinition { get; set; } = new PathDefinition();
+
+        public PathDefinition? ValidPathDefinition { get; set; }
     }
 }

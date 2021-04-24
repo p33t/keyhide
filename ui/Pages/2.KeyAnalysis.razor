@@ -97,6 +97,9 @@
     private void NextScreen()
     {
         _uiState.ValidKeyDefinition = _uiState.KeyDefinition.DeepCopy();
+        _uiState.PathDefinition.EffectiveKeyString = _uiState.KeyDefinition.Separator == null 
+            ? _uiState.KeyDefinition.KeyString 
+            : _uiState.KeyDefinition.KeyString.Replace(_uiState.KeyDefinition.SeparatorStr, "");
         _navigationManager.NavigateTo("3");
     }
 

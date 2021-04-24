@@ -14,7 +14,7 @@ namespace uiTest
         {
             ColCount = 10,
             RowCount = 10,
-            KeyString = "abccda",
+            EffectiveKeyString = "abccda",
             Coords = NicePathElems
         };
 
@@ -37,8 +37,8 @@ namespace uiTest
             {NicePathDefinition, 0, ""},
             {NicePathDefinition with {Coords = NicePathElems.Take(4)}, 1, "not enough" },
             {NicePathDefinition with {Coords = NicePathElems.Take(4).Append(CellCoord.Create(1, 2))}, 1, "conflict"},
-            {NicePathDefinition with {KeyString = null}, 1, "No key string"},
-            {NicePathDefinition with {KeyString = string.Empty}, 1, "Empty key string"},
+            {NicePathDefinition with {EffectiveKeyString = null}, 1, "No key string"},
+            {NicePathDefinition with {EffectiveKeyString = string.Empty}, 1, "Empty key string"},
             {NicePathDefinition with {ColCount = 9}, 1, "too few cols"},
             {NicePathDefinition with {ColCount = 101}, 1, "too many cols"}, 
             {NicePathDefinition with {RowCount = 9}, 1, "too few rows"}, 

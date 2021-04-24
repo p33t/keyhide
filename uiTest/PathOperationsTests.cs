@@ -31,7 +31,7 @@ namespace uiTest
             grid[Coord(4, 3)] = '3';
             var last = Coord(4, 4);
             grid[last] = '4';
-            var actual = PathOperations.CoordIsAvailable(Coord(candidateCol, candidateRow), grid, last,
+            var actual = PathOperations.CoordIsAvailable(Coord(candidateCol, candidateRow), c => grid[c], last,
                 keyString);
             Assert.Equal(expAvailable, actual);
         }

@@ -25,5 +25,8 @@ namespace ui
             Enumerable.Range(0, _data.GetLength(0))
                 .SelectMany(ixCol => Enumerable.Range(0, _data.GetLength(1))
                     .Select(ixRow => CellCoord.Create(ixCol, ixRow)));
+
+        public bool Contains(CellCoord coord) =>
+            0 <= coord.RowIndex && coord.RowIndex < RowCount && 0 <= coord.ColIndex && coord.ColIndex < ColCount;
     }
 }

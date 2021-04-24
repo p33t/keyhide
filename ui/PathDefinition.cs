@@ -8,14 +8,16 @@ namespace ui
     {
         public const int DefaultColCount = 24;
         public const int DefaultRowCount = 32;
+        public const int MinCount = 10;
+        public const int MaxCount = 100;
 
-        [Required] [Range(10, 100)] public int ColCount { get; set; } = DefaultColCount;
+        [Required] [Range(MinCount, MaxCount)] public int ColCount { get; set; } = DefaultColCount;
 
-        [Required] [Range(10, 100)] public int RowCount { get; set; } = DefaultRowCount;
+        [Required] [Range(MinCount, MaxCount)] public int RowCount { get; set; } = DefaultRowCount;
 
         public IEnumerable<CellCoord> Coords { get; set; } = Enumerable.Empty<CellCoord>();
 
-        public string? KeyString { get; set; }
+        public string? EffectiveKeyString { get; set; }
 
         public PathDefinition DeepCopy()
         {
@@ -30,8 +32,8 @@ namespace ui
             if (!Coords.Any())
                 errors.Add(new ValidationResult("No path elements", new[] {nameof(Coords)}));
 
-            if (string.IsNullOrEmpty(KeyString))
-                errors.Add(new ValidationResult("No key has been supplied", new[] {nameof(KeyString)}));
+            if (string.IsNullOrEmpty(EffectiveKeyString))
+                errors.Add(new ValidationResult("No key has been supplied", new[] {nameof(EffectiveKeyString)}));
             else
                 ValidatePath(model, errors);
             
@@ -41,7 +43,7 @@ namespace ui
         private void ValidatePath(PathDefinition model, List<ValidationResult> errors)
         {
             var grid = new CoordGrid<char?>(model.ColCount, model.RowCount);
-            string remaining = KeyString!;
+            string remaining = EffectiveKeyString!;
 
             // consume a key character OR return false if an error was registered
             bool Consume(CellCoord coord)
@@ -65,24 +67,16 @@ namespace ui
                 return true;
             }
 
-            CellCoord? prev = null;
-            foreach (var coord in model.Coords)
+            foreach (var coord in PathOperations.Trace(model.Coords))
             {
-                if (0 > coord.RowIndex || coord.RowIndex >= model.RowCount ||
-                    0 > coord.ColIndex || coord.ColIndex >= model.ColCount)
+                if (!grid.Contains(coord))
                 {
                     errors.Add(new ValidationResult($"Illegal coordinate {coord}", new[] {nameof(Coords)}));
                     return;
                 }
 
-                var isSingleCellLeg = prev is null || Equals(prev.Value, coord);
-                IEnumerable<CellCoord> leg = isSingleCellLeg 
-                    ? new[] {coord} 
-                    : PathOperations.Trace(prev!.Value, coord).Skip(1);
-                if (leg.Any(legCoord => !Consume(legCoord)))
+                if (!Consume(coord))
                     return;
-                
-                prev = coord;
             }
 
             if (remaining.Length > 0)

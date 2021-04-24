@@ -8,16 +8,16 @@ namespace ui
     public static class PathOperations
     {
         /// Indicates whether the given coordinate can be used as the next path element
-        public static bool CoordIsAvailable(CellCoord candidate, CoordGrid<char?> grid, CellCoord last, string keyString)
+        public static bool CoordIsAvailable(CellCoord candidate, Func<CellCoord, char?> grid, CellCoord last, string keyString)
         {
             string pathString = candidate.Equals(last) ? 
                 keyString : // if same cell then will only have 1 elem path
-                grid[last]! + keyString; // otherwise path begins with last coordinate
+                grid(last)! + keyString; // otherwise path begins with last coordinate
             return TraceLeg(last, candidate)
                 .Take(pathString.Length)
                 .Select((coord, index) =>
                 {
-                    var ch = grid[coord];
+                    var ch = grid(coord);
                     return ch == null || ch == pathString[index];
                 })
                 .All(x => x);
