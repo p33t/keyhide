@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace ui
@@ -12,7 +13,7 @@ namespace ui
             string pathString = candidate.Equals(last) ? 
                 keyString : // if same cell then will only have 1 elem path
                 grid[last]! + keyString; // otherwise path begins with last coordinate
-            return Trace(last, candidate)
+            return TraceLeg(last, candidate)
                 .Take(pathString.Length)
                 .Select((coord, index) =>
                 {
@@ -44,9 +45,23 @@ namespace ui
         {
             throw new NotImplementedException("No need yet... this is an optimisation");
         }
+
+        /// Trace the full path defined by the given coords
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        public static IEnumerable<CellCoord> Trace(IEnumerable<CellCoord> coords)
+        {
+            return coords.Aggregate(Enumerable.Empty<CellCoord>(), (soFar, next) =>
+            {
+                CellCoord? last = soFar.LastOrDefault();
+                var isSingleCellLeg = last == null || Equals(last, next);
+                if (isSingleCellLeg)
+                    return soFar.Append(next);
+                return Enumerable.Concat(soFar, TraceLeg(last!, next).Skip(1));
+            });
+        }
         
        /// Return the series of coords plotting a deterministic path 'direct' between the two given coords
-        public static IEnumerable<CellCoord> Trace(CellCoord coordFrom, CellCoord coordTo)
+        public static IEnumerable<CellCoord> TraceLeg(CellCoord coordFrom, CellCoord coordTo)
         {
             if (coordFrom.Equals(coordTo))
                 return new[] {coordTo};
@@ -54,7 +69,7 @@ namespace ui
             var ixRow = StepCloser(coordFrom.RowIndex, coordTo.RowIndex);
             var ixCol = StepCloser(coordFrom.ColIndex, coordTo.ColIndex);
             var altFrom = CellCoord.Create(ixCol, ixRow);
-            var tail = Trace(altFrom, coordTo);
+            var tail = TraceLeg(altFrom, coordTo);
             return tail.Prepend(coordFrom);
         }
 

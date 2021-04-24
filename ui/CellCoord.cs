@@ -1,8 +1,6 @@
-using System;
-
 namespace ui
 {
-    public struct CellCoord
+    public record CellCoord
     {
         public static readonly CellCoord Origin = Create(0, 0);
 

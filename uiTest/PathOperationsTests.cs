@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using ui;
 using Xunit;
@@ -25,12 +26,12 @@ namespace uiTest
             ..123
             ....4
              */
-            grid[CellCoord.Create(2, 3)] = '1';
-            grid[CellCoord.Create(3, 3)] = '2';
-            grid[CellCoord.Create(4, 3)] = '3';
-            var last = CellCoord.Create(4, 4);
+            grid[Coord(2, 3)] = '1';
+            grid[Coord(3, 3)] = '2';
+            grid[Coord(4, 3)] = '3';
+            var last = Coord(4, 4);
             grid[last] = '4';
-            var actual = PathOperations.CoordIsAvailable(CellCoord.Create(candidateCol, candidateRow), grid, last,
+            var actual = PathOperations.CoordIsAvailable(Coord(candidateCol, candidateRow), grid, last,
                 keyString);
             Assert.Equal(expAvailable, actual);
         }
@@ -47,56 +48,87 @@ namespace uiTest
             Assert.Equal(expected, PathOperations.ColName(position));
         }
 
-        public static TheoryData<CellCoord[]> TraceFixtures => new()
+        public static TheoryData<CellCoord[]> TraceLegFixtures => new()
         {
             new[]
             {
-                CellCoord.Create(0, 0)
+                Coord(0, 0)
             },
             new[]
             {
-                CellCoord.Create(0, 0),
-                CellCoord.Create(1, 1)
+                Coord(0, 0),
+                Coord(1, 1)
             },
             new[]
             {
-                CellCoord.Create(0, 0),
-                CellCoord.Create(0, 1)
+                Coord(0, 0),
+                Coord(0, 1)
             },
             new[]
             {
-                CellCoord.Create(0, 0),
-                CellCoord.Create(1, 0)
+                Coord(0, 0),
+                Coord(1, 0)
             },
             new[]
             {
-                CellCoord.Create(0, 0),
-                CellCoord.Create(1, 1),
-                CellCoord.Create(2, 1)
+                Coord(0, 0),
+                Coord(1, 1),
+                Coord(2, 1)
             },
             new[]
             {
-                CellCoord.Create(2, 1),
-                CellCoord.Create(1, 0),
-                CellCoord.Create(0, 0)
+                Coord(2, 1),
+                Coord(1, 0),
+                Coord(0, 0)
             },
             new[]
             {
-                CellCoord.Create(3, 3),
-                CellCoord.Create(2, 3),
-                CellCoord.Create(1, 3),
-                CellCoord.Create(0, 3),
+                Coord(3, 3),
+                Coord(2, 3),
+                Coord(1, 3),
+                Coord(0, 3),
             }
         };
 
+        private static CellCoord Coord(int colIndex, int rowIndex)
+        {
+            return CellCoord.Create(colIndex, rowIndex);
+        }
+
         [Theory]
-        [MemberData(nameof(TraceFixtures))]
-        public void TraceWorks(CellCoord[] expected)
+        [MemberData(nameof(TraceLegFixtures))]
+        public void TraceLegWorks(CellCoord[] expected)
         {
             var from = expected[0];
             var to = expected[^1];
-            var actual = PathOperations.Trace(from, to).ToArray();
+            var actual = PathOperations.TraceLeg(from, to).ToArray();
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void TraceWorks()
+        {
+            void Check(CellCoord[] input, CellCoord[] expected)
+            {
+                var actual = PathOperations.Trace(input);
+                Assert.Equal(expected, actual);
+            }
+
+            Check(Array.Empty<CellCoord>(), Array.Empty<CellCoord>());
+            Check(new[] {Coord(0, 0)}, new[] {Coord(0, 0)});
+            Check(new[] {Coord(0, 0), Coord(1, 1)}, new[] {Coord(0, 0), Coord(1, 1)});
+            Check(new[]
+            {
+                Coord(0, 0),
+                Coord(2, 1),
+                Coord(2, 2)
+            }, new[]
+            {
+                Coord(0, 0),
+                Coord(1, 1),
+                Coord(2, 1),
+                Coord(2, 2),
+            });
         }
     }
 }
