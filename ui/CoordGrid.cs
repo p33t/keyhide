@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -5,26 +6,57 @@ namespace ui
 {
     public class CoordGrid<T>
     {
-        private readonly T[,] _data;
+        private readonly IDictionary<CellCoord, T> _data = new Dictionary<CellCoord, T>();
 
         public CoordGrid(int colCount, int rowCount)
         {
-            _data = new T[colCount, rowCount];
+            RowCount = rowCount;
+            ColCount = colCount;
         }
 
-        public int ColCount => _data.GetLength(0);
-        public int RowCount => _data.GetLength(1);
-        
-        public T this[CellCoord coord]
+        public int ColCount { get; }
+        public int RowCount { get; }
+
+        public T? this[CellCoord coord]
         {
-            get => _data[coord.ColIndex, coord.RowIndex];
-            set => _data[coord.ColIndex, coord.RowIndex] = value;
+            get
+            {
+                CheckContains(coord);
+
+                return _data.TryGetValue(coord, out var t) ? t : default;
+            }
+            set
+            {
+                CheckContains(coord);
+                if (value == null)
+                {
+                    _data.Remove(coord);
+                }
+                else
+                {
+                    _data[coord] = value;
+                }
+            }
+        }
+
+        private void CheckContains(CellCoord coord)
+        {
+            if (!Contains(coord))
+            {
+                var max = CellCoord.Create(ColCount - 1, RowCount - 1);
+                throw new IndexOutOfRangeException($"{coord} is outside range of grid {max}");
+            }
         }
 
         public IEnumerable<CellCoord> AllCoords() =>
-            Enumerable.Range(0, _data.GetLength(0))
-                .SelectMany(ixCol => Enumerable.Range(0, _data.GetLength(1))
+            Enumerable.Range(0, ColCount)
+                .SelectMany(ixCol => Enumerable.Range(0, RowCount)
                     .Select(ixRow => CellCoord.Create(ixCol, ixRow)));
+
+        public void Reset()
+        {
+            _data.Clear();
+        }
 
         public bool Contains(CellCoord coord) =>
             0 <= coord.RowIndex && coord.RowIndex < RowCount && 0 <= coord.ColIndex && coord.ColIndex < ColCount;

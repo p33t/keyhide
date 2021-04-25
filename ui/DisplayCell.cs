@@ -1,9 +1,10 @@
 namespace ui
 {
-    public struct DisplayCell
+    public record DisplayCell
     {
+        public static DisplayCell Default = new DisplayCell();
         public char? Content { get; set; }
-        
-        public bool? IsAvailable { get; set; }
+
+        public bool IsAvailable { get; set; } = true;
     }
 }

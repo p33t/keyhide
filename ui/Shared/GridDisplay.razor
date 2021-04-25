@@ -8,12 +8,10 @@
                 {
                     var coord = CellCoord.Create(ixCol, ixRow);
                     var displayCell = Grid[coord];
-                    var occupied = displayCell.Content == null
+                    var occupied = displayCell?.Content == null
                         ? "unoccupied"
                         : "occupied";
-                    var available = displayCell.IsAvailable == null
-                        ? ""
-                        : displayCell.IsAvailable.Value
+                    var available = displayCell?.IsAvailable ?? true
                             ? "available"
                             : "unavailable";
                     var isOddCell = ((ixRow / BoxSize) % 2 + (ixCol / BoxSize) % 2) % 2 == 0
