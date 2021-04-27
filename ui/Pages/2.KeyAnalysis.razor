@@ -11,7 +11,7 @@
     @* NOTE: IValidatableObject error checking only occurs upon submit *@
     <EditForm EditContext="@EditContext" OnValidSubmit="@NextScreen">
         <div class="form-fields">
-            <button type="button" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
+            <button type="button"  class="next-button btn btn-warning" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
             <button type="submit" class="next-button btn btn-warning">Next</button>
             <div class="form-field">
                 <label>Prefix:</label>
@@ -110,9 +110,11 @@
 
     private void Undo()
     {
-        Console.WriteLine("Undo clicked " + DateTime.Now);
         if (_uiState.ValidKeyDefinition != null)
+        {
             _uiState.KeyDefinition.ReadFields(_uiState.ValidKeyDefinition);
+            EditContext.Validate();
+        }
     }
 
 }

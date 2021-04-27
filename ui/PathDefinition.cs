@@ -11,6 +11,13 @@ namespace ui
         public const int MinCount = 10;
         public const int MaxCount = 100;
 
+        public void ReadFields(PathDefinition source)
+        {
+            ColCount = source.ColCount;
+            RowCount = source.RowCount;
+            Coords = source.Coords;
+        }
+        
         [Required] [Range(MinCount, MaxCount)] public int ColCount { get; set; } = DefaultColCount;
 
         [Required] [Range(MinCount, MaxCount)] public int RowCount { get; set; } = DefaultRowCount;

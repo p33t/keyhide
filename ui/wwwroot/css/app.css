@@ -73,7 +73,7 @@ a, .btn-link {
 
 .next-button {
     margin: auto;
-    display: block;
+    display: inline-block;
     font-weight: 700;
     border-radius: 20px;
     padding: 0.4rem 1.2rem;

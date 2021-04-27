@@ -12,8 +12,11 @@
 <div class="main">
     <EditForm EditContext="@EditContext" OnValidSubmit="@NextScreen">
         <div class="form-fields">
-            <button type="button" class="next-button btn btn-warning" @OnClick="Back">Back</button>
-            <button type="submit" class="next-button btn btn-warning">Next</button>
+            <div>
+                <button type="button" class="next-button btn btn-warning" @onclick="NavBack">Back</button>
+                <button type="button"  class="next-button btn btn-warning" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
+                <button type="submit" class="next-button btn btn-warning">Next</button>
+            </div>
             <div class="form-field">
                 <label>Columns:</label>
                 <div>
@@ -45,7 +48,7 @@
                         <br/>
                     }
                     <button type="button" @onclick="Reset">Reset</button>
-                    <button type="button" @onclick="Undo">Undo</button>
+                    <button type="button" @onclick="UndoLeg">Undo</button>
                     <ValidationMessage For="@(() => _uiState.PathDefinition.Coords)"/>
                 </div>
             </div>
@@ -57,6 +60,9 @@
 
 
 @code {
+#nullable enable
+
+    private bool UndoDisabled => _uiState.ValidPathDefinition == null;
     private CoordGrid<DisplayCell> Grid { get; set; } = new(GridSetupModel.DefaultColCount, GridSetupModel.DefaultRowCount);
     private EditContext EditContext { get; set; } = null!;
 
@@ -113,7 +119,7 @@
         EditContext.Validate();
     }
 
-    private void Undo()
+    private void UndoLeg()
     {
         var count = _uiState.PathDefinition.Coords.Count();
         if (count > 0)
@@ -158,9 +164,19 @@
         }
     }
 
-    private void Back()
+    private void NavBack()
     {
+        Console.WriteLine("Navigating to '2'");
         _navigationManager.NavigateTo("2");
     }
 
+    private void Undo()
+    {
+        if (_uiState.ValidPathDefinition != null)
+        {
+            _uiState.PathDefinition.ReadFields(_uiState.ValidPathDefinition);
+            EditContext.Validate();
+        }
+    }
+    
 }
