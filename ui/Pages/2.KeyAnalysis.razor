@@ -9,9 +9,9 @@
 </p>
 <div class="main">
     @* NOTE: IValidatableObject error checking only occurs upon submit *@
-    <EditForm Model="_uiState.KeyDefinition" OnValidSubmit="@(e => NextScreen())">
+    <EditForm EditContext="@EditContext" OnValidSubmit="@NextScreen">
         <div class="form-fields">
-            <button @onclick="Undo">Undo</button>
+            <button type="button" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
             <button type="submit" class="next-button btn btn-warning">Next</button>
             <div class="form-field">
                 <label>Prefix:</label>
@@ -25,7 +25,7 @@
                 <label>Key:</label>
                 <div>
                     <InputText @bind-Value="_uiState.KeyDefinition.KeyString" minlength="1"/>
-                    <button @onclick="Analyze">Analyze</button>
+                    <button type="button" @onclick="Analyze">Analyze</button>
                     <ValidationMessage For="@(() => _uiState.KeyDefinition.KeyString)"/>
                 </div>
             </div>
@@ -75,6 +75,13 @@
     // Causes 'Undo' become available only after field on-change:
     // || _uiState.KeyDefinition.Equals(_uiState.ValidKeyDefinition)
 
+    private EditContext EditContext { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        EditContext = new EditContext(_uiState.KeyDefinition);
+        base.OnInitialized();
+    }    
     private void PredefinedCharsChanged(ChangeEventArgs evt)
     {
         KeyCharSetEnum? charSet;
@@ -82,16 +89,14 @@
             charSet = Enum.Parse<KeyCharSetEnum>(charSetStr);
         else
             charSet = null;
-        _uiState.KeyDefinition = _uiState.KeyDefinition with {CharSet = charSet};
+        _uiState.KeyDefinition.CharSet = charSet;
     }
 
     private void Analyze()
     {
         var altDef = KeyAnalyzer.AnalyzeKeyString(_uiState.KeyDefinition.KeyString);
-        _uiState.KeyDefinition = altDef with {
-            Prefix = _uiState.KeyDefinition.Prefix, 
-            Suffix = _uiState.KeyDefinition.Suffix
-            };
+        _uiState.KeyDefinition.ReadFields(altDef);
+        EditContext.Validate();
     }
 
     private void NextScreen()
@@ -107,7 +112,7 @@
     {
         Console.WriteLine("Undo clicked " + DateTime.Now);
         if (_uiState.ValidKeyDefinition != null)
-            _uiState.KeyDefinition = _uiState.ValidKeyDefinition.DeepCopy();
+            _uiState.KeyDefinition.ReadFields(_uiState.ValidKeyDefinition);
     }
 
 }

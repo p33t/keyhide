@@ -10,7 +10,7 @@
 </p>
 
 <div class="main">
-    <EditForm Model="_uiState.PathDefinition" OnValidSubmit="@NextScreen">
+    <EditForm EditContext="@EditContext" OnValidSubmit="@NextScreen">
         <div class="form-fields">
             <button type="button" class="next-button btn btn-warning" @OnClick="Back">Back</button>
             <button type="submit" class="next-button btn btn-warning">Next</button>
@@ -44,8 +44,8 @@
                         <text>(Empty)</text>
                         <br/>
                     }
-                    <button @onclick="Reset">Reset</button>
-                    <button @onclick="Undo">Undo</button>
+                    <button type="button" @onclick="Reset">Reset</button>
+                    <button type="button" @onclick="Undo">Undo</button>
                     <ValidationMessage For="@(() => _uiState.PathDefinition.Coords)"/>
                 </div>
             </div>
@@ -58,6 +58,13 @@
 
 @code {
     private CoordGrid<DisplayCell> Grid { get; set; } = new(GridSetupModel.DefaultColCount, GridSetupModel.DefaultRowCount);
+    private EditContext EditContext { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        EditContext = new EditContext(_uiState.PathDefinition);
+        base.OnInitialized();
+    }
 
     protected override void OnParametersSet()
     {
@@ -103,6 +110,7 @@
                 }
             }
         }
+        EditContext.Validate();
     }
 
     private void Undo()
@@ -136,6 +144,7 @@
         {
             _uiState.PathDefinition.ColCount = colCount;
             Reset();
+            EditContext.Validate();
         }
     }
 
@@ -145,6 +154,7 @@
         {
             _uiState.PathDefinition.RowCount = colCount;
             Reset();
+            EditContext.Validate();
         }
     }
 

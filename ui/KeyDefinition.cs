@@ -6,6 +6,15 @@ namespace ui
 {
     public record KeyDefinition : IValidatableObject
     {
+        public void ReadFields(KeyDefinition source)
+        {
+            KeyString = source.KeyString;
+            CharSet = source.CharSet;
+            Separator = source.Separator;
+            CustomCharset = source.CustomCharset;
+            Prefix = source.Prefix;
+            Suffix = source.Suffix;
+        }
         [Required] public string KeyString { get; set; } = string.Empty;
 
         public KeyCharSetEnum? CharSet { get; set; }

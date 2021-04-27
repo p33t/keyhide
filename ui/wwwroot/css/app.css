@@ -103,7 +103,7 @@ td.oddCell {
 }
 
 td.occupied {
-    background-color: white;
+    background-color: lightskyblue;
 }
 
 td.available a {
