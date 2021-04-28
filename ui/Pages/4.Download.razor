@@ -1,6 +1,21 @@
 @page "/4"
+@inject UiState _uiState
+@inject IJSRuntime _jsRuntime
 <h3>Download</h3>
+<p>
+    Trace the same path on the grid in this HTML file to reveal your secret key.
+    <button type="button" @onclick="Download">Download</button>
+</p>
 
 @code {
-    
+#nullable enable
+
+    private async Task Download()
+    {
+    // Generate a text file
+        byte[] file = System.Text.Encoding.UTF8.GetBytes("Hello world!");
+        var b64 = Convert.ToBase64String(file);
+        await _jsRuntime.InvokeVoidAsync("saveAsFile", "file.txt", "text/plain", b64);
+    }
+
 }
