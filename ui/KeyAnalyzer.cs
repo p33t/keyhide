@@ -83,5 +83,91 @@ namespace ui
 
             return new HashSet<char>(s);
         }
+
+        public static FinalModel CreateFinalModel(PathDefinition pathDefinition, KeyDefinition keyDefinition,
+            IEnumerable<char> filler)
+        {
+            var effectiveKeyString = pathDefinition.EffectiveKeyString!;
+            var grid = new CoordGrid<char?>(pathDefinition.ColCount, pathDefinition.RowCount);
+
+            var count = 0;
+            foreach (var coord in PathOperations.Trace(pathDefinition.Coords))
+            {
+                if (count < effectiveKeyString.Length)
+                    grid[coord] = effectiveKeyString[count];
+
+                count++;
+            }
+
+            using var fillerator = filler.GetEnumerator();
+            foreach (var coord in grid.AllCoords())
+            {
+                if (grid[coord] == null)
+                {
+                    if (!fillerator.MoveNext())
+                        throw new InvalidOperationException($"Ran out of filler at {coord}");
+
+                    grid[coord] = fillerator.Current;
+                }
+            }
+
+            var rowStrings = new string[grid.RowCount];
+            for (var ixRow = 0; ixRow < rowStrings.Length; ixRow++)
+            {
+                var row = string.Empty;
+                for (var ixCol = 0; ixCol < grid.ColCount; ixCol++)
+                {
+                    row += grid[CellCoord.Create(ixCol, ixRow)];
+                }
+
+                rowStrings[ixRow] = row;
+            }
+
+            var fragmentCycles = keyDefinition.Separator == null 
+                ? Array.Empty<int>() 
+                : CalcFragmentCycles(keyDefinition.KeyString, keyDefinition.Separator!.Value);
+            
+            return new FinalModel
+            {
+                Subtract = count - effectiveKeyString.Length,
+                Prefix = keyDefinition.Prefix ?? string.Empty,
+                Suffix = keyDefinition.Suffix ?? string.Empty,
+                FragmentSeparator = keyDefinition.SeparatorStr,
+                FragmentCycles = fragmentCycles,
+                Grid = rowStrings
+            };
+        }
+
+        public static int[] CalcFragmentCycles(string keyString, char separator)
+        {
+            var lengths = keyString.Split(separator).Select(s => s.Length).ToList();
+            if (lengths.Count <= 1)
+                return Array.Empty<int>();
+
+            // no need for last one if it's shorter than the first (due to cycling)
+            if (lengths[^1] <= lengths[0])
+                lengths.RemoveAt(lengths.Count - 1);
+
+            for (var candidateCycleLength = 1; candidateCycleLength < lengths.Count; candidateCycleLength++)
+            {
+                var candidateCycle = lengths.GetRange(0, candidateCycleLength);
+                bool success = true;
+                for (var ixStart = candidateCycleLength; ixStart < lengths.Count; ixStart += candidateCycleLength)
+                {
+                    var nextCycle = lengths.Skip(ixStart).Take(candidateCycleLength).ToList();
+                    var match = candidateCycle.Take(nextCycle.Count).SequenceEqual(nextCycle);
+                    if (!match)
+                    {
+                        success = false;
+                        break;
+                    }
+                }
+
+                if (success)
+                    return candidateCycle.ToArray();
+            }
+
+            return lengths.ToArray();
+        }
     }
 }

@@ -7,6 +7,75 @@ namespace uiTest
 {
     public class KeyAnalyzerTests
     {
+        [Fact]
+        public void CreateFinalModelWorks()
+        {
+            var keyDefinition = new KeyDefinition
+            {
+                Prefix = "pref",
+                Suffix = "suff",
+                Separator = '_',
+                KeyString = "ab_cd_e"
+            };
+            var pathDefinition = new PathDefinition
+            {
+                /*
+                 * ....c.
+                 * ...bd.
+                 * ..a.e.
+                 * ......
+                 * ......
+                 */
+                Coords = new[] {CellCoord.Create(2, 2), CellCoord.Create(4, 0), CellCoord.Create(4, 4)},
+                ColCount = 6,
+                RowCount = 5,
+                EffectiveKeyString = "abcde"
+            };
+
+            IEnumerable<char> Xs()
+            {
+                while (true)
+                    yield return '.';
+                // ReSharper disable once IteratorNeverReturns
+            }
+
+            var actual = KeyAnalyzer.CreateFinalModel(pathDefinition, keyDefinition, Xs());
+            Assert.Equal(new[]
+            {
+                "....c.",
+                "...bd.",
+                "..a.e.",
+                "......",
+                "......",
+            }, actual.Grid);
+            Assert.Equal(keyDefinition.Prefix, actual.Prefix);
+            Assert.Equal(keyDefinition.Suffix, actual.Suffix);
+            Assert.Equal(keyDefinition.SeparatorStr, actual.FragmentSeparator);
+            Assert.Equal(2, actual.Subtract); // coords length - effectiveKeyString.Length
+            Assert.Equal(new[] {2}, actual.FragmentCycles);
+        }
+
+        [Theory]
+        [InlineData("abc")]
+        [InlineData("abc-", 3)]
+        [InlineData("-abc", 0, 3)]
+        [InlineData("abc-def", 3)]
+        [InlineData("abc-de", 3)]
+        [InlineData("abc-def-ghi", 3)]
+        [InlineData("abc-def-gh", 3)]
+        [InlineData("abc-defg", 3, 4)]
+        [InlineData("abc-defg-abc-defg", 3, 4)]
+        [InlineData("abc-defg-abc-defg-abc", 3, 4)]
+        [InlineData("abc-defg-abc-defg-abc-defg-a", 3, 4)]
+        [InlineData("abc-defg-hijkl", 3, 4, 5)]
+        [InlineData("abc-defg-hijkl-abc", 3, 4, 5)]
+        [InlineData("abc-defg-hijkl-abc-", 3, 4, 5)]
+        public void CalcFragmentCyclesWorks(string keyString, params int[] expected)
+        {
+            var actual = KeyAnalyzer.CalcFragmentCycles(keyString, '-');
+            Assert.Equal(expected, actual);
+        }
+
         [Theory]
         [InlineData(KeyCharSetEnum.AlphaNumeric, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")]
         [InlineData(KeyCharSetEnum.Numeric, "0123456789")]
@@ -74,8 +143,8 @@ namespace uiTest
         {
             {"1", new[] {1}},
             {"1,2", new[] {1, 2}},
-            {"1, 2", new [] {1, 2}},
-            {"1 ,2", new [] {1, 2}},
+            {"1, 2", new[] {1, 2}},
+            {"1 ,2", new[] {1, 2}},
             {",1", null},
             {"1,", null},
             {"0", null},
