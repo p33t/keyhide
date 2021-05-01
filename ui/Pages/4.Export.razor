@@ -5,21 +5,21 @@
 @using System.Reflection
 @using System.Text
 @using System.IO
-<h3>Download</h3>
+<h3>Export</h3>
 <p>
     Trace the same path on the grid in this HTML file to reveal your secret key.<br/>
     (Don't forget to remove the ".txt" extension)
 </p>
 <p>
-    <button type="button" @onclick="Download" disabled="@DownloadDisabled">Download</button>
+    <button type="button" @onclick="ExportDeliverable" disabled="@ExportDisabled">Export</button>
 </p>
 
 @code {
 #nullable enable
 
-    private bool DownloadDisabled => _uiState.ValidKeyDefinition == null || _uiState.ValidPathDefinition == null;
+    private bool ExportDisabled => _uiState.ValidKeyDefinition == null || _uiState.ValidPathDefinition == null;
 
-    private async Task Download()
+    private async Task ExportDeliverable()
     {
         var keyDefinition = _uiState.ValidKeyDefinition!;
         var pathDefinition = _uiState.ValidPathDefinition!;
@@ -33,7 +33,7 @@
         
         var model = KeyAnalyzer.CreateFinalModel(pathDefinition, keyDefinition, filler);
 
-        byte[] file = System.Text.Encoding.UTF8.GetBytes(await RenderFinal(model));
+        byte[] file = Encoding.UTF8.GetBytes(await RenderFinal(model));
         var b64 = Convert.ToBase64String(file);
         var timeString = DateTime.Now.ToString("yyyy-MM-dd_hh_mm_ss");
         await _jsRuntime.InvokeVoidAsync("saveAsFile", $"keyhide_{timeString}.html.txt", "text/plain", b64);
@@ -41,15 +41,21 @@
 
     private async Task<string> RenderFinal(FinalModel model)
     {
+        var deliverable = await LoadDeliverable();
+        return deliverable.Replace("// FINAL_MODEL_MARKER", $"finalModel = {JsonSerializer.Serialize(model)};");
+    }
+
+    private static async Task<string> LoadDeliverable()
+    {
         var assembly = Assembly.GetAssembly(typeof(UiState));
         var fileName = $"{assembly!.GetName().Name}.etc.deliverable.html";
         await using var resFilestream = assembly.GetManifestResourceStream(fileName);
-        var ms = new MemoryStream();
+        await using var ms = new MemoryStream();
         await resFilestream!.CopyToAsync(ms);
-        var deliverable = Encoding.UTF8.GetString(ms.ToArray());
+        await resFilestream.DisposeAsync();
+        var bytes = ms.ToArray();
         await ms.DisposeAsync();
-        var json = JsonSerializer.Serialize(model);
-        return deliverable.Replace("// FINAL_MODEL_MARKER", $"finalModel = {json};");
+        return Encoding.UTF8.GetString(bytes);
     }
 
 }
