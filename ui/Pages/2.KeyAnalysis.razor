@@ -46,14 +46,13 @@
             <div class="form-field">
                 <label>Pre-defined Characters:</label>
                 <div>
-                    @* TODO: This doesn't play nice with 'undo' *@
-                    <select class="custom-select" @onchange="PredefinedCharsChanged">
-                        <option value="" selected="@(_uiState.KeyDefinition.CharSet == null)">(Custom)</option>
+                    <InputSelect @bind-Value="_uiState.KeyDefinition.CharSet">
+                        <option @key=null value="">(Custom)</option>
                         @foreach (var charSet in Enum.GetValues<KeyCharSetEnum>())
                         {
-                            <option value="@charSet" selected="@(charSet == _uiState.KeyDefinition.CharSet)">@charSet</option>
+                            <option @key=charSet value="@charSet">@charSet</option>
                         }
-                    </select>
+                    </InputSelect>
                     <ValidationMessage For="@(() => _uiState.KeyDefinition.CharSet)"/>
                 </div>
             </div>
@@ -82,16 +81,6 @@
     {
         EditContext = new EditContext(_uiState.KeyDefinition);
         base.OnInitialized();
-    }
-
-    private void PredefinedCharsChanged(ChangeEventArgs evt)
-    {
-        KeyCharSetEnum? charSet;
-        if (evt.Value is string {Length: > 0 } charSetStr)
-            charSet = Enum.Parse<KeyCharSetEnum>(charSetStr);
-        else
-            charSet = null;
-        _uiState.KeyDefinition.CharSet = charSet;
     }
 
     private void Analyze()

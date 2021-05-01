@@ -33,7 +33,6 @@ namespace ui
 
         public string? Suffix { get; set; }
 
-        
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var def = (KeyDefinition) validationContext.ObjectInstance;
@@ -41,11 +40,11 @@ namespace ui
 
             if (def.CharSet == null && string.IsNullOrEmpty(def.CustomCharset))
                 errors.Add(new ValidationResult("Need pre-defined or custom character set",
-                    new[] {nameof(KeyDefinition.CharSet), nameof(KeyDefinition.CustomCharset)}));
+                    new[] {nameof(CharSet), nameof(CustomCharset)}));
 
             if (def.CharSet != null && !string.IsNullOrEmpty(def.CustomCharset))
                 errors.Add(new ValidationResult("Cannot specify both pre-defined and custom character set",
-                    new[] {nameof(KeyDefinition.CharSet), nameof(KeyDefinition.CustomCharset)}));
+                    new[] {nameof(CharSet), nameof(CustomCharset)}));
 
             var charSet = def.CharSet != null
                 ? KeyAnalyzer.CharSetFor(def.CharSet!.Value)
@@ -55,14 +54,14 @@ namespace ui
 
             if (def.Separator != null && charSet != null && charSet.Contains(def.Separator!.Value))
                 errors.Add(new ValidationResult("Character set contains the separator",
-                    new[] {nameof(KeyDefinition.Separator)}));
+                    new[] {nameof(Separator)}));
 
             var keyStringChars = new HashSet<char>(def.KeyString);
             if (string.IsNullOrEmpty(def.KeyString))
                 errors.Add(new ValidationResult("Need key string", new[] {nameof(KeyDefinition.KeyString)}));
             else if (def.Separator != null && !keyStringChars.Contains(def.Separator!.Value))
                 errors.Add(new ValidationResult("Key string does not contain the separator",
-                    new[] {nameof(KeyDefinition.Separator)}));
+                    new[] {nameof(Separator)}));
 
             if (charSet != null)
             {
