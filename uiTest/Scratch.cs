@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using ui;
 using Xunit;
 using Xunit.Abstractions;
@@ -14,6 +18,20 @@ namespace uiTest
         public Scratch(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
+        }
+
+        [Fact]
+        public async Task CanLoadAssemblyResource()
+        {
+            var assembly = Assembly.GetAssembly(typeof(UiState));
+            var fileName = $"{assembly!.GetName().Name}.etc.deliverable.html";
+            await using var resFilestream = assembly.GetManifestResourceStream(fileName);
+            Assert.NotNull(resFilestream);
+            var ms = new MemoryStream();
+            await resFilestream!.CopyToAsync(ms);
+            var str = Encoding.UTF8.GetString(ms.ToArray());
+            await ms.DisposeAsync();
+            // _testOutputHelper.WriteLine(str);
         }
 
         [Fact(Skip = "Not generating ATM")]

@@ -1,21 +1,55 @@
 @page "/4"
 @inject UiState _uiState
 @inject IJSRuntime _jsRuntime
+@using System.Text.Json
+@using System.Reflection
+@using System.Text
+@using System.IO
 <h3>Download</h3>
 <p>
-    Trace the same path on the grid in this HTML file to reveal your secret key.
-    <button type="button" @onclick="Download">Download</button>
+    Trace the same path on the grid in this HTML file to reveal your secret key.<br/>
+    (Don't forget to remove the ".txt" extension)
+</p>
+<p>
+    <button type="button" @onclick="Download" disabled="@DownloadDisabled">Download</button>
 </p>
 
 @code {
 #nullable enable
 
+    private bool DownloadDisabled => _uiState.ValidKeyDefinition == null || _uiState.ValidPathDefinition == null;
+
     private async Task Download()
     {
-    // Generate a text file
-        byte[] file = System.Text.Encoding.UTF8.GetBytes("Hello world!");
+        var keyDefinition = _uiState.ValidKeyDefinition!;
+        var pathDefinition = _uiState.ValidPathDefinition!;
+        var charSet = keyDefinition.CharSet == null
+            ? keyDefinition.CustomCharset!.ToHashSet()
+            : KeyAnalyzer.CharSetFor(keyDefinition.CharSet!.Value);
+
+        using var randomDoubles = RandomCharacter.PseudoRandom().GetEnumerator();
+        var filler = RandomCharacter.GenerateCharacters(pathDefinition.EffectiveKeyString!,
+            pathDefinition.ColCount * pathDefinition.RowCount, charSet, randomDoubles);
+        
+        var model = KeyAnalyzer.CreateFinalModel(pathDefinition, keyDefinition, filler);
+
+        byte[] file = System.Text.Encoding.UTF8.GetBytes(await RenderFinal(model));
         var b64 = Convert.ToBase64String(file);
-        await _jsRuntime.InvokeVoidAsync("saveAsFile", "file.txt", "text/plain", b64);
+        var timeString = DateTime.Now.ToString("yyyy-MM-dd_hh_mm_ss");
+        await _jsRuntime.InvokeVoidAsync("saveAsFile", $"keyhide_{timeString}.html.txt", "text/plain", b64);
+    }
+
+    private async Task<string> RenderFinal(FinalModel model)
+    {
+        var assembly = Assembly.GetAssembly(typeof(UiState));
+        var fileName = $"{assembly!.GetName().Name}.etc.deliverable.html";
+        await using var resFilestream = assembly.GetManifestResourceStream(fileName);
+        var ms = new MemoryStream();
+        await resFilestream!.CopyToAsync(ms);
+        var deliverable = Encoding.UTF8.GetString(ms.ToArray());
+        await ms.DisposeAsync();
+        var json = JsonSerializer.Serialize(model);
+        return deliverable.Replace("// FINAL_MODEL_MARKER", $"finalModel = {json};");
     }
 
 }

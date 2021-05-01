@@ -8,11 +8,19 @@ namespace ui
 {
     public static class RandomCharacter
     {
+        private static readonly Random RandomInstance = new Random();
+        public static IEnumerable<double> PseudoRandom()
+        {
+            while (true)
+                yield return RandomInstance.NextDouble();
+            // ReSharper disable once IteratorNeverReturns
+        }
+        
         /// <summary>
         /// Generate random characters, preferring characters that are not already chosen already
         /// so as the result will have a reasonably random appearance spread.
         /// </summary>
-        public static IList<char> GenerateCharacters(IEnumerable<char> already, int targetSize, HashSet<char> charSet,
+        public static IList<char> GenerateCharacters(IEnumerable<char> already, int targetSize, ISet<char> charSet,
             IEnumerator<double> randomDoubles)
         {
             var spread = CalculateSpread(already, targetSize, charSet);
@@ -41,7 +49,7 @@ namespace ui
         /// <param name="maxVsAvgOccurenceRatio">Max occurrences of a character as compared to avg occurrences.  Default 3.</param>
         /// <returns>Characters and their relative probability of being chosen</returns>
         public static Dictionary<char, float> CalculateSpread(IEnumerable<char> already, int targetSize,
-            HashSet<char> charSet, int maxVsAvgOccurenceRatio = 3)
+            ISet<char> charSet, int maxVsAvgOccurenceRatio = 3)
         {
             var maxOccurrence = targetSize * maxVsAvgOccurenceRatio / (float) charSet.Count;
 

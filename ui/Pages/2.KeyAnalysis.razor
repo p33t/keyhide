@@ -11,7 +11,7 @@
     @* NOTE: IValidatableObject error checking only occurs upon submit *@
     <EditForm EditContext="@EditContext" OnValidSubmit="@NextScreen">
         <div class="form-fields">
-            <button type="button"  class="next-button btn btn-warning" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
+            <button type="button" class="next-button btn btn-warning" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
             <button type="submit" class="next-button btn btn-warning">Next</button>
             <div class="form-field">
                 <label>Prefix:</label>
@@ -46,6 +46,7 @@
             <div class="form-field">
                 <label>Pre-defined Characters:</label>
                 <div>
+                    @* TODO: This doesn't play nice with 'undo' *@
                     <select class="custom-select" @onchange="PredefinedCharsChanged">
                         <option value="" selected="@(_uiState.KeyDefinition.CharSet == null)">(Custom)</option>
                         @foreach (var charSet in Enum.GetValues<KeyCharSetEnum>())
@@ -81,7 +82,8 @@
     {
         EditContext = new EditContext(_uiState.KeyDefinition);
         base.OnInitialized();
-    }    
+    }
+
     private void PredefinedCharsChanged(ChangeEventArgs evt)
     {
         KeyCharSetEnum? charSet;
@@ -101,10 +103,15 @@
 
     private void NextScreen()
     {
-        _uiState.ValidKeyDefinition = _uiState.KeyDefinition.DeepCopy();
-        _uiState.PathDefinition.EffectiveKeyString = _uiState.KeyDefinition.Separator == null 
-            ? _uiState.KeyDefinition.KeyString 
-            : _uiState.KeyDefinition.KeyString.Replace(_uiState.KeyDefinition.SeparatorStr, "");
+        if (!Equals(_uiState.ValidPathDefinition, _uiState.PathDefinition))
+        {
+            _uiState.ValidKeyDefinition = _uiState.KeyDefinition.DeepCopy();
+            _uiState.PathDefinition.EffectiveKeyString = _uiState.KeyDefinition.Separator == null
+                ? _uiState.KeyDefinition.KeyString
+                : _uiState.KeyDefinition.KeyString.Replace(_uiState.KeyDefinition.SeparatorStr, "");
+            _uiState.ValidPathDefinition = null;
+            _uiState.PathDefinition.Coords = Enumerable.Empty<CellCoord>();
+        }
         _navigationManager.NavigateTo("3");
     }
 
