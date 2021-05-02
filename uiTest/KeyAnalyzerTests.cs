@@ -81,6 +81,8 @@ namespace uiTest
         [InlineData(KeyCharSetEnum.Numeric, "0123456789")]
         [InlineData(KeyCharSetEnum.AlphabetLower, "abcdefghijklmnopqrstuvwxyz")]
         [InlineData(KeyCharSetEnum.HexadecimalUpper, "ABCDEF0123456789")]
+        [InlineData(KeyCharSetEnum.AlphaNumericUpperSansIOU10, "23456789ABCDEFGHJKLMNPQRSTVWXYZ")]
+        [InlineData(KeyCharSetEnum.AlphaNumericUpperSans1890, "234567ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
         public void CharSetForWorks(KeyCharSetEnum charSetEnum, string expected)
         {
             var actual = KeyAnalyzer.CharSetFor(charSetEnum);
@@ -126,7 +128,7 @@ namespace uiTest
                 "9843cpahcp9mw84m9q348rmcp984328m3pijfp", new KeyDefinition
                 {
                     KeyString = "9843cpahcp9mw84m9q348rmcp984328m3pijfp",
-                    CharSet = KeyCharSetEnum.AlphaNumeric
+                    CharSet = KeyCharSetEnum.AlphaNumericLower
                 }
             }
         };

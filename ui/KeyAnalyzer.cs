@@ -16,12 +16,13 @@ namespace ui
         public static KeyDefinition AnalyzeKeyString(string keyString)
         {
             //////////////////////////////////////// Need to convert to 'raw key string' inside a KeyDefinition
-            return SpaceChars
-                .Select(ch => (char?) ch)
-                // no separator option
-                .Prepend(null)
-                .SelectMany(sepOpt => Enum.GetValues<KeyCharSetEnum>()
-                    .Select(charSet => new KeyDefinition
+            return Enum.GetValues<KeyCharSetEnum>()
+                .SelectMany(charSet => SpaceChars 
+                    .Where(separator => !CharSetFor(charSet).Contains(separator))
+                    .Select(ch => (char?) ch)
+                    // no separator option
+                    .Prepend(null)
+                    .Select(sepOpt => new KeyDefinition
                     {
                         KeyString = keyString,
                         Separator = sepOpt,
@@ -37,7 +38,7 @@ namespace ui
         /// <summary>
         /// Returns a list of string describing any problems with the given KeyDefinition.
         /// </summary>
-        public static IList<ValidationResult> ValidateKeyDefinition(KeyDefinition def)
+        private static IList<ValidationResult> ValidateKeyDefinition(KeyDefinition def)
         {
             var result = new List<ValidationResult>();
             Validator.TryValidateObject(def, new ValidationContext(def), result, true);
@@ -72,16 +73,50 @@ namespace ui
         {
             var s = charSetEnum switch
             {
-                KeyCharSetEnum.Numeric => "0123456789",
-                KeyCharSetEnum.AlphabetLower => "abcdefghijklmnopqrstuvwxyz",
-                KeyCharSetEnum.AlphabetUpper => "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-                KeyCharSetEnum.AlphaNumeric => "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-                KeyCharSetEnum.HexadecimalLower => "0123456789abcdef",
-                KeyCharSetEnum.HexadecimalUpper => "0123456789ABCDEF",
+                KeyCharSetEnum.Octal => string.Join(null, Enumerable.Range(0, 8)),
+                KeyCharSetEnum.Numeric => Digits,
+                KeyCharSetEnum.AlphabetLower => AlphabetLower,
+                KeyCharSetEnum.AlphabetUpper => AlphabetUpper,
+                KeyCharSetEnum.HexadecimalLower => HexadecimalLower,
+                KeyCharSetEnum.HexadecimalUpper => HexadecimalUpper,
+                KeyCharSetEnum.AlphaNumericUpperSans1890 => Sans(AlphaNumUpper, "1890"),
+                KeyCharSetEnum.AlphaNumericUpperSansIOU10 => Sans(AlphaNumUpper, "IOU10"),
+                KeyCharSetEnum.AlphaNumericLower => string.Join(null, Digits, AlphabetLower),
+                KeyCharSetEnum.AlphaNumericUpper => AlphaNumUpper,
+                KeyCharSetEnum.AlphaNumeric => AlphaNum,
+                KeyCharSetEnum.Base64 => string.Join(null, Digits, AlphabetLower, AlphabetUpper, "+/"),
+                KeyCharSetEnum.ReadableSansSpace => AlphaNumPunctSymbol,
+                KeyCharSetEnum.Readable => Readable,
                 _ => throw new ArgumentException($"Unrecognised option {charSetEnum}", nameof(charSetEnum))
             };
 
             return new HashSet<char>(s);
+        }
+
+
+        private static readonly string Digits = string.Join(null, Enumerable.Range(0, 10));
+        private static readonly string AlphabetLower = string.Join(null, CharRange('a', 26));
+        private static readonly string AlphabetUpper = AlphabetLower.ToUpperInvariant();
+        private static readonly string HexadecimalLower = Digits + string.Join(null, AlphabetLower.Take(6));
+        private static readonly string HexadecimalUpper = HexadecimalLower.ToUpperInvariant();
+        private static readonly string AlphaNumUpper = string.Join(null, Digits, AlphabetUpper);
+        private static readonly string AlphaNum = string.Join(null, Digits, AlphabetLower, AlphabetUpper);
+        private static readonly string Readable = string.Join(null, CharRange(' ', 95));
+        private static readonly string AlphaNumPunctSymbol = Sans(Readable, " ");
+        // private const string Symbol = "$+<=>^`|~";
+        // private static readonly string PunctSymbol = Sans(AlphaNumPunctSymbol, AlphaNum);
+        // private static readonly string Punctuation = Sans(PunctSymbol, Symbol);
+
+        private static IEnumerable<char> CharRange(char start, int count)
+        {
+            return Enumerable.Range(start, count).Select(i => (char) i);
+        }
+
+        private static string Sans(string original, string sans)
+        {
+            var chars = original.ToList();
+            chars.RemoveAll(sans.Contains);
+            return string.Join(null, chars);
         }
 
         public static FinalModel CreateFinalModel(PathDefinition pathDefinition, KeyDefinition keyDefinition,
@@ -123,10 +158,10 @@ namespace ui
                 rowStrings[ixRow] = row;
             }
 
-            var fragmentCycles = keyDefinition.Separator == null 
-                ? Array.Empty<int>() 
+            var fragmentCycles = keyDefinition.Separator == null
+                ? Array.Empty<int>()
                 : CalcFragmentCycles(keyDefinition.KeyString, keyDefinition.Separator!.Value);
-            
+
             return new FinalModel
             {
                 Subtract = count - effectiveKeyString.Length,
