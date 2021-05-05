@@ -9,6 +9,7 @@ namespace ui
         public void ReadFields(KeyDefinition source)
         {
             KeyString = source.KeyString;
+            SampleKeyStrings = source.SampleKeyStrings;
             CharSet = source.CharSet;
             Separator = source.Separator;
             CustomCharset = source.CustomCharset;
@@ -17,6 +18,7 @@ namespace ui
         }
         [Required] public string KeyString { get; set; } = string.Empty;
 
+        public string SampleKeyStrings { get; set; } = string.Empty;
         public KeyCharSetEnum? CharSet { get; set; }
 
         public char? Separator { get; set; }

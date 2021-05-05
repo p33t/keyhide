@@ -105,3 +105,8 @@ td.available a {
 td.unavailable a {
     color: #b21f2d;
 }
+
+span.tally-included-zero, span.tally-extra {
+    color: darkred;
+    font-weight: bold;
+}

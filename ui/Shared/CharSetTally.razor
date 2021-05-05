@@ -1,0 +1,65 @@
+@using System.Collections.Immutable
+<table>
+    @foreach (var (ch, count) in IncludedTally)
+    {
+        <td>
+            <span class="@(count == 0 ? "tally-included-zero" : "tally-included" )">@ch</span><br/>
+            <span class="tally-count">@(count == 0 ? "-" : count.ToString())</span>
+        </td>
+    }
+</table>
+
+@if (ExtrasTally.Any())
+{
+    <table>
+        @foreach (var (ch, count) in ExtrasTally)
+        {
+            <td>
+                <span class="tally-extra">@ch</span><br/>
+                <span class="tally-count">@count</span>
+            </td>
+        }
+    </table>
+}
+
+@code {
+
+    private List<(char, int)> IncludedTally { get; set; } = new List<(char, int)>();
+
+    private List<(char, int)> ExtrasTally { get; set; } = new List<(char, int)>();
+
+    [Parameter]
+    public string KeyStrings { get; set; } = string.Empty;
+
+    [Parameter]
+    public char? Separator { get; set; }
+    
+    [Parameter]
+    public ISet<char> CharSet { get; set; } = ImmutableHashSet<char>.Empty;
+
+    protected override void OnParametersSet()
+    {
+        var tally = KeyStrings
+            .Where(ch => ch != '\n' && ch != Separator)
+            .GroupBy(ch => ch)
+            .ToDictionary(grp => grp.Key, grp => grp.Count());
+
+        IncludedTally = CharSet
+            .Select(ch =>
+            {
+                tally.TryGetValue(ch, out var count);
+                return (ch, count);
+            })
+            .ToList();
+        IncludedTally.Sort((left, right) => left.Item1.CompareTo(right.Item1));
+
+        ExtrasTally = tally
+            .Where(kv => !CharSet.Contains(kv.Key))
+            .Select(kv => (kv.Key, kv.Value))
+            .ToList();
+        ExtrasTally.Sort((left, right) => left.Item1.CompareTo(right.Item1));
+
+        base.OnParametersSet();
+    }
+
+}
