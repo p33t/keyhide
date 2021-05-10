@@ -1,4 +1,4 @@
-@page "/4"
+@page "/5"
 @inject UiState _uiState
 @inject IJSRuntime _jsRuntime
 @inject NavigationManager _navigationManager
@@ -14,7 +14,7 @@
 <p>
     <button type="button" @onclick="ExportDeliverable" disabled="@ExportDisabled">Export</button>
 </p>
-<button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo("3"))">Back</button>
+<button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo("4"))">Back</button>
 
 
 @code {

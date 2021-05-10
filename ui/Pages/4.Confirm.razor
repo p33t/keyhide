@@ -1,0 +1,89 @@
+@page "/4"
+@inject UiState _uiState
+@inject NavigationManager _navigationManager
+<h3>Confirm</h3>
+<p>
+    Confirm the grid below adequately hides your key.
+    If your key stands out you likely need to adjust the parameters in <NavLink href="2">Key Analysis</NavLink>.
+    Regenerate the random characters if the current ones do not suit.
+</p>
+<button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo("3"))">Back</button>
+<button type="button" class="next-button btn btn-warning" disabled="@RegenerateDisabled" @onclick="@Regenerate">Regenerate</button>
+<button type="button" class="next-button btn btn-warning" disabled="@RegenerateDisabled" @onclick="@(() => _navigationManager.NavigateTo("5"))">Next</button>
+
+<p>&nbsp;</p>
+
+@if (_model == null)
+{
+    <p>
+        Unable to generate grid.
+        Please ensure key has been <NavLink href="2">analyzed</NavLink> and path has been <NavLink href="3">setup</NavLink>.
+    </p>
+}
+@if (_model != null)
+{
+    <button type="button" @onclick="@TogglePath">Show / Hide Path</button>
+    <table>
+        @for (var ixRow = 0; ixRow < _model.Grid.Length; ixRow++)
+        {
+            var row = _model.Grid[ixRow];
+            <tr @key=ixRow>
+                @for (var ixCol = 0; ixCol < row.Length; ixCol++)
+                {
+                    var ch = row[ixCol];
+                    var onPath = _showPath && _path.Contains(CellCoord.Create(ixCol, ixRow));
+                    var cls = onPath ? "confirmCellHighlight" : "confirmCell";
+                    <td @key=ixCol class="@cls">@ch</td>
+                }
+            </tr>
+        }
+    </table>
+}
+
+@code {
+    private bool RegenerateDisabled => _uiState.ValidKeyDefinition == null || _uiState.ValidPathDefinition == null;
+
+    private FinalModel? _model;
+    private readonly HashSet<CellCoord> _path = new HashSet<CellCoord>();
+    private bool _showPath;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (RegenerateDisabled)
+            _model = null;
+
+        else if (_model == null)
+        {
+            _path.Clear();
+            foreach (var cellCoord in PathOperations.Trace(_uiState.ValidPathDefinition!.Coords))
+            {
+                _path.Add(cellCoord);
+            }
+            Regenerate();
+        }
+    }
+
+    private void TogglePath()
+    {
+        _showPath = !_showPath;
+        StateHasChanged();
+    }
+
+    private void Regenerate()
+    {
+        var keyDefinition = _uiState.ValidKeyDefinition!;
+        var pathDefinition = _uiState.ValidPathDefinition!;
+        var charSet = keyDefinition.CharSet == null
+            ? keyDefinition.CustomCharset!.ToHashSet()
+            : KeyAnalyzer.CharSetFor(keyDefinition.CharSet!.Value);
+
+        using var randomDoubles = RandomCharacter.PseudoRandom().GetEnumerator();
+        var filler = RandomCharacter.GenerateCharacters(pathDefinition.EffectiveKeyString!,
+            pathDefinition.ColCount * pathDefinition.RowCount, charSet, randomDoubles);
+
+        _model = KeyAnalyzer.CreateFinalModel(pathDefinition, keyDefinition, filler);
+    }
+
+}

@@ -17,7 +17,7 @@ namespace ui
         public int ColIndex
         {
             get => _colIndex;
-            init
+            private init
             {
                 if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
                 _colIndex = value;

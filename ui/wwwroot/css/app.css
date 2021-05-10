@@ -77,7 +77,13 @@ a, .btn-link {
     padding: 1.5rem !important;
 }
 
-td {
+td.confirmCell, td.confirmCellHighlight {
+    padding: 0 .1em 0 .1em;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+td.evenCell, td.oddCell {
     padding: .3em
 }
 
@@ -93,7 +99,7 @@ td.oddCell {
     background-color: ghostwhite;
 }
 
-td.occupied {
+td.occupied, td.confirmCellHighlight {
     background-color: lightskyblue;
 }
 
