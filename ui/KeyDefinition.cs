@@ -18,6 +18,10 @@ namespace ui
         }
         [Required] public string KeyString { get; set; } = string.Empty;
 
+        public string EffectiveKeyString => Separator == null
+            ? KeyString
+            : KeyString.Replace(SeparatorStr, "");
+        
         public string SampleKeyStrings { get; set; } = string.Empty;
         public KeyCharSetEnum? CharSet { get; set; }
 

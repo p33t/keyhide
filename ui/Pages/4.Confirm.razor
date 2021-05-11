@@ -13,20 +13,20 @@
 
 <p>&nbsp;</p>
 
-@if (_model == null)
+@if (_uiState.FinalModel == null)
 {
     <p>
         Unable to generate grid.
         Please ensure key has been <NavLink href="2">analyzed</NavLink> and path has been <NavLink href="3">setup</NavLink>.
     </p>
 }
-@if (_model != null)
+@if (_uiState.FinalModel != null)
 {
     <button type="button" @onclick="@TogglePath">Show / Hide Path</button>
     <table>
-        @for (var ixRow = 0; ixRow < _model.Grid.Length; ixRow++)
+        @for (var ixRow = 0; ixRow < _uiState.FinalModel.Grid.Length; ixRow++)
         {
-            var row = _model.Grid[ixRow];
+            var row = _uiState.FinalModel.Grid[ixRow];
             <tr @key=ixRow>
                 @for (var ixCol = 0; ixCol < row.Length; ixCol++)
                 {
@@ -43,7 +43,6 @@
 @code {
     private bool RegenerateDisabled => _uiState.ValidKeyDefinition == null || _uiState.ValidPathDefinition == null;
 
-    private FinalModel? _model;
     private readonly HashSet<CellCoord> _path = new HashSet<CellCoord>();
     private bool _showPath;
 
@@ -51,18 +50,17 @@
     {
         base.OnParametersSet();
 
+        _path.Clear();
         if (RegenerateDisabled)
-            _model = null;
-
-        else if (_model == null)
+            return;
+        
+        foreach (var cellCoord in PathOperations.Trace(_uiState.ValidPathDefinition!.Coords))
         {
-            _path.Clear();
-            foreach (var cellCoord in PathOperations.Trace(_uiState.ValidPathDefinition!.Coords))
-            {
-                _path.Add(cellCoord);
-            }
-            Regenerate();
+            _path.Add(cellCoord);
         }
+        
+        if (_uiState.FinalModel == null)
+            Regenerate();
     }
 
     private void TogglePath()
@@ -83,7 +81,7 @@
         var filler = RandomCharacter.GenerateCharacters(pathDefinition.EffectiveKeyString!,
             pathDefinition.ColCount * pathDefinition.RowCount, charSet, randomDoubles);
 
-        _model = KeyAnalyzer.CreateFinalModel(pathDefinition, keyDefinition, filler);
+        _uiState.FinalModel = KeyAnalyzer.CreateFinalModel(pathDefinition, keyDefinition, filler);
     }
 
 }

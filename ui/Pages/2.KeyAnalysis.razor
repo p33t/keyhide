@@ -75,7 +75,7 @@
     <DataAnnotationsValidator/>
     <CharSetTally
         KeyStrings="@(_uiState.KeyDefinition.KeyString + _uiState.KeyDefinition.SampleKeyStrings)"
-        Separator = "@_uiState.KeyDefinition.Separator"
+        Separator="@_uiState.KeyDefinition.Separator"
         CharSet="@(_uiState.KeyDefinition.CharSet == null ? (_uiState.KeyDefinition.CustomCharset ?? "").ToHashSet() : KeyAnalyzer.CharSetFor(_uiState.KeyDefinition.CharSet!.Value))"/>
 </EditForm>
 
@@ -103,16 +103,7 @@
 
     private void NextScreen()
     {
-        if (!Equals(_uiState.ValidKeyDefinition, _uiState.KeyDefinition))
-        {
-            Console.WriteLine("Resetting path");
-            _uiState.ValidKeyDefinition = _uiState.KeyDefinition.DeepCopy();
-            _uiState.PathDefinition.EffectiveKeyString = _uiState.KeyDefinition.Separator == null
-                ? _uiState.KeyDefinition.KeyString
-                : _uiState.KeyDefinition.KeyString.Replace(_uiState.KeyDefinition.SeparatorStr, "");
-            _uiState.ValidPathDefinition = null;
-            _uiState.PathDefinition.Coords = Enumerable.Empty<CellCoord>();
-        }
+        _uiState.ValidKeyDefinition = _uiState.KeyDefinition.DeepCopy();
         _navigationManager.NavigateTo("3");
     }
 
@@ -135,4 +126,5 @@
             _uiState.KeyDefinition.CharSet = null;
         }
     }
+
 }
