@@ -103,7 +103,7 @@
 
     private void NextScreen()
     {
-        if (!Equals(_uiState.ValidPathDefinition, _uiState.PathDefinition))
+        if (!Equals(_uiState.ValidKeyDefinition, _uiState.KeyDefinition))
         {
             Console.WriteLine("Resetting path");
             _uiState.ValidKeyDefinition = _uiState.KeyDefinition.DeepCopy();
@@ -111,7 +111,6 @@
                 ? _uiState.KeyDefinition.KeyString
                 : _uiState.KeyDefinition.KeyString.Replace(_uiState.KeyDefinition.SeparatorStr, "");
             _uiState.ValidPathDefinition = null;
-            // TODO: This doesn't work...test changing from fragment separator
             _uiState.PathDefinition.Coords = Enumerable.Empty<CellCoord>();
         }
         _navigationManager.NavigateTo("3");
