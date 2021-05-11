@@ -11,35 +11,43 @@
     Trace the same path on the grid in this HTML file to reveal your secret key.<br/>
     (Don't forget to remove the ".txt" extension)
 </p>
-<p>
-    <button type="button" @onclick="ExportDeliverable" disabled="@ExportDisabled">Export</button>
-</p>
 <button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo("4"))">Back</button>
-
+<p>&nbsp;</p>
+@if (ExportDisabled)
+{
+    <p>Unable to export. Please ensure all previous steps have been completed.</p>
+}
+@if (!ExportDisabled)
+{
+    <p>
+        <a download="@_fileName" href="@($"data:text/plain;base64,{_base64}")">Download</a> or
+        @* <a target="_blank" href="@($"data:text/html;base64,{_base64}")">Open in new tab</a> *@
+        @* <a href="5" @onclick="@OpenNewTab">Open in new tab</a> *@
+        <button type="button" @onclick="@OpenNewTab">Open in new tab</button>
+    </p>
+}
 
 @code {
 #nullable enable
 
-    private bool ExportDisabled => _uiState.ValidKeyDefinition == null || _uiState.ValidPathDefinition == null;
+    private bool ExportDisabled => _uiState.FinalModel == null;
 
-    private async Task ExportDeliverable()
+    private string? _base64;
+    private string? _html;
+    private string? _fileName;
+
+    protected override async Task OnParametersSetAsync()
     {
-        var keyDefinition = _uiState.ValidKeyDefinition!;
-        var pathDefinition = _uiState.ValidPathDefinition!;
-        var charSet = keyDefinition.CharSet == null
-            ? keyDefinition.CustomCharset!.ToHashSet()
-            : KeyAnalyzer.CharSetFor(keyDefinition.CharSet!.Value);
+        await base.OnParametersSetAsync();
 
-        using var randomDoubles = RandomCharacter.PseudoRandom().GetEnumerator();
-        var filler = RandomCharacter.GenerateCharacters(pathDefinition.EffectiveKeyString!,
-            pathDefinition.ColCount * pathDefinition.RowCount, charSet, randomDoubles);
-
-        var model = KeyAnalyzer.CreateFinalModel(pathDefinition, keyDefinition, filler);
-
-        byte[] file = Encoding.UTF8.GetBytes(await RenderFinal(model));
-        var b64 = Convert.ToBase64String(file);
-        var timeString = DateTime.Now.ToString("yyyy-MM-dd_hh_mm_ss");
-        await _jsRuntime.InvokeVoidAsync("saveAsFile", $"keyhide_{timeString}.html.txt", "text/plain", b64);
+        if (!ExportDisabled)
+        {
+            _html = await RenderFinal(_uiState.FinalModel!);
+            byte[] file = Encoding.UTF8.GetBytes(_html);
+            _base64 = Convert.ToBase64String(file);
+            var timeString = _uiState.FinalModelTimestamp!.Value.ToString("yyyy-MM-dd_hh_mm_ss");
+            _fileName = $"keyhide_{timeString}.html.txt";
+        }
     }
 
     private async Task<string> RenderFinal(FinalModel model)
@@ -61,4 +69,8 @@
         return Encoding.UTF8.GetString(bytes);
     }
 
+    private async Task OpenNewTab()
+    {
+        await _jsRuntime.InvokeVoidAsync("openInNewTab", _html!);
+    }
 }

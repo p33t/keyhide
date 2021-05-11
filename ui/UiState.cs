@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 
 namespace ui
@@ -6,6 +7,8 @@ namespace ui
     {
         private KeyDefinition? _validKeyDefinition;
         private PathDefinition? _validPathDefinition;
+        private DateTime? _finalModelTimestamp;
+        private FinalModel? _finalModel;
         public KeyDefinition KeyDefinition { get; set; } = new KeyDefinition();
 
         /// The definition that was validated successfully
@@ -39,6 +42,22 @@ namespace ui
             }
         }
 
-        public FinalModel? FinalModel { get; set; }
+        public FinalModel? FinalModel
+        {
+            get => _finalModel;
+            set
+            {
+                if (Equals(_finalModel, value))
+                    return;
+                
+                _finalModel = value;
+                if (value != null)
+                {
+                    _finalModelTimestamp = DateTime.Now;
+                }
+            }
+        }
+
+        public DateTime? FinalModelTimestamp => _finalModelTimestamp;
     }
 }

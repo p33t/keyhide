@@ -2,7 +2,7 @@ using System;
 
 namespace ui
 {
-    public class FinalModel
+    public record FinalModel
     {
         public string[] Grid { get; set; } = Array.Empty<string>();
 

@@ -10,14 +10,14 @@
     <link href="css/app.css" rel="stylesheet" />
     <link href="ui.styles.css" rel="stylesheet" />
     <script type="application/javascript">
-        function saveAsFile(filename, contentType, bytesBase64) {
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href = `data:${contentType};base64,${bytesBase64}`;
-            document.body.appendChild(link); // Needed for Firefox
-            link.click();
-            document.body.removeChild(link);
-        }        
+        function openInNewTab(htmlString) {
+        // window.openInNewTab = function(htmlString) {
+            const newWindow = window.open("_blank");
+            newWindow.document.open();
+            newWindow.document.write(htmlString);
+            newWindow.document.close();
+            newWindow.focus(); 
+        }
     </script>
 </head>
 
