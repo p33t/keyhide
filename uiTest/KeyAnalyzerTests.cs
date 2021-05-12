@@ -12,10 +12,10 @@ namespace uiTest
         {
             var keyDefinition = new KeyDefinition
             {
-                Prefix = "pref",
-                Suffix = "suff",
+                PrefixLength = 4,
+                SuffixLength = 4,
                 Separator = '_',
-                KeyString = "ab_cd_e"
+                KeyString = "pre-ab_cd_e-suf"
             };
             var pathDefinition = new PathDefinition
             {

@@ -160,7 +160,7 @@ namespace ui
 
             var fragmentCycles = keyDefinition.Separator == null
                 ? Array.Empty<int>()
-                : CalcFragmentCycles(keyDefinition.KeyString, keyDefinition.Separator!.Value);
+                : CalcFragmentCycles(keyDefinition.KeyStringBody, keyDefinition.Separator!.Value);
 
             return new FinalModel
             {

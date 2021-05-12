@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.VisualBasic;
 
 namespace ui
 {
@@ -13,21 +15,39 @@ namespace ui
             CharSet = source.CharSet;
             Separator = source.Separator;
             CustomCharset = source.CustomCharset;
-            Prefix = source.Prefix;
-            Suffix = source.Suffix;
             PrefixLength = source.PrefixLength;
             SuffixLength = source.SuffixLength;
         }
+
         [Required] public string KeyString { get; set; } = string.Empty;
 
+        public string KeyStringBody => ExtractBody(KeyString);
+
+        private string ExtractBody(string keyString)
+        {
+            return string.Join(null, keyString.Skip(PrefixLengthSafe).Reverse().Skip(SuffixLengthSafe).Reverse());
+        }
+
+        public string[] CompleteSampleBody =>
+            SampleKeyStrings
+                .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Append(KeyString)
+                .Select(ExtractBody)
+                .Where(s => !string.IsNullOrEmpty(s))
+                .ToArray();
+
         public string EffectiveKeyString => Separator == null
-            ? KeyString
-            : KeyString.Replace(SeparatorStr, "");
-        
+            ? KeyStringBody
+            : KeyStringBody.Replace(SeparatorStr, "");
+
         public int PrefixLength { get; set; }
-        
+
+        private int PrefixLengthSafe => Math.Max(PrefixLength, 0);
+
         public int SuffixLength { get; set; }
-        
+
+        private int SuffixLengthSafe => Math.Max(SuffixLength, 0);
+
         public string SampleKeyStrings { get; set; } = string.Empty;
         public KeyCharSetEnum? CharSet { get; set; }
 
@@ -41,22 +61,26 @@ namespace ui
 
         public string? CustomCharset { get; set; }
 
-        public string? Prefix { get; set; }
+        public string Prefix => string.Join(null, KeyString.Take(PrefixLengthSafe));
 
-        public string? Suffix { get; set; }
+        public string Suffix => string.Join(null, KeyString.Reverse().Take(SuffixLengthSafe).Reverse());
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var def = (KeyDefinition) validationContext.ObjectInstance;
             var errors = new List<ValidationResult>();
 
+            void AddError(string msg, params string[] fields)
+            {
+                errors!.Add(new ValidationResult(msg, fields));
+            }
+
             if (def.CharSet == null && string.IsNullOrEmpty(def.CustomCharset))
-                errors.Add(new ValidationResult("Need pre-defined or custom character set",
-                    new[] {nameof(CharSet), nameof(CustomCharset)}));
+                AddError("Need pre-defined or custom character set", nameof(CharSet), nameof(CustomCharset));
 
             if (def.CharSet != null && !string.IsNullOrEmpty(def.CustomCharset))
-                errors.Add(new ValidationResult("Cannot specify both pre-defined and custom character set",
-                    new[] {nameof(CharSet), nameof(CustomCharset)}));
+                AddError("Cannot specify both pre-defined and custom character set", nameof(CharSet),
+                    nameof(CustomCharset));
 
             var charSet = def.CharSet != null
                 ? KeyAnalyzer.CharSetFor(def.CharSet!.Value)
@@ -65,15 +89,24 @@ namespace ui
                     : null;
 
             if (def.Separator != null && charSet != null && charSet.Contains(def.Separator!.Value))
-                errors.Add(new ValidationResult("Character set contains the separator",
-                    new[] {nameof(Separator)}));
+                AddError("Character set contains the separator",
+                    nameof(Separator));
 
-            var keyStringChars = new HashSet<char>(def.KeyString);
+            if (def.PrefixLength < 0)
+                AddError("Prefix length must be > 0", nameof(KeyDefinition.PrefixLength));
+
+            if (def.SuffixLength < 0)
+                AddError("Suffix length must be > 0", nameof(KeyDefinition.SuffixLength));
+
+            var keyStringChars = new HashSet<char>(def.KeyStringBody);
             if (string.IsNullOrEmpty(def.KeyString))
-                errors.Add(new ValidationResult("Need key string", new[] {nameof(KeyDefinition.KeyString)}));
+                AddError("Need key string", nameof(KeyDefinition.KeyString));
+            else if (string.IsNullOrEmpty(def.KeyStringBody))
+                AddError("Key string is entirely prefix/suffix",
+                    nameof(KeyDefinition.KeyString), nameof(PrefixLength), nameof(SuffixLength));
             else if (def.Separator != null && !keyStringChars.Contains(def.Separator!.Value))
-                errors.Add(new ValidationResult("Key string does not contain the separator",
-                    new[] {nameof(Separator)}));
+                AddError("Key string does not contain the separator",
+                    nameof(Separator));
 
             if (charSet != null)
             {
@@ -82,8 +115,8 @@ namespace ui
                     : keyStringChars.Where(ch => ch != def.Separator).ToHashSet();
 
                 if (!sansSeparator.IsSubsetOf(charSet))
-                    errors.Add(new ValidationResult("Key string contains characters not present in character set",
-                        new[] {nameof(KeyString)}));
+                    AddError("Key string contains characters not present in character set",
+                        nameof(KeyString));
             }
 
             return errors.AsReadOnly();

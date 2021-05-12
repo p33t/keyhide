@@ -14,26 +14,11 @@
         <button type="button" class="next-button btn btn-warning" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
         <button type="submit" class="next-button btn btn-warning">Next</button>
         <div class="form-field">
-            <label>Prefix:</label>
-
-            <div>
-                <InputText @bind-Value="@(_uiState.KeyDefinition.Prefix)"/>
-                <ValidationMessage For="@(() => _uiState.KeyDefinition.Prefix)"/>
-            </div>
-        </div>
-        <div class="form-field">
             <label>Key:</label>
             <div>
                 <InputText @bind-Value="_uiState.KeyDefinition.KeyString" minlength="1"/>
                 <button type="button" @onclick="Analyze">Analyze</button>
                 <ValidationMessage For="@(() => _uiState.KeyDefinition.KeyString)"/>
-            </div>
-        </div>
-        <div class="form-field">
-            <label>Suffix:</label>
-            <div>
-                <InputText @bind-Value="_uiState.KeyDefinition.Suffix"/>
-                <ValidationMessage For="@(() => _uiState.KeyDefinition.Suffix)"/>
             </div>
         </div>
         <div class="form-field">
@@ -92,7 +77,7 @@
     </div>
     <DataAnnotationsValidator/>
     <CharSetTally
-        KeyStrings="@(_uiState.KeyDefinition.KeyString + _uiState.KeyDefinition.SampleKeyStrings)"
+        KeyStrings="@(string.Join(null, _uiState.KeyDefinition.CompleteSampleBody))"
         Separator="@_uiState.KeyDefinition.Separator"
         CharSet="@(_uiState.KeyDefinition.CharSet == null ? (_uiState.KeyDefinition.CustomCharset ?? "").ToHashSet() : KeyAnalyzer.CharSetFor(_uiState.KeyDefinition.CharSet!.Value))"/>
 </EditForm>
