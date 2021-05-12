@@ -44,6 +44,24 @@
             </div>
         </div>
         <div class="form-field">
+            <label>Prefix / Suffix:</label>
+            <div style="display: flex;">
+                <div style="display: inline-block; width: 50%;">
+                    <input type="range" min="0" max="@(Math.Max(_uiState.KeyDefinition.KeyString.Length, 20))"
+                           @bind-value="@_uiState.KeyDefinition.PrefixLength" @bind-value:event="oninput"/>
+                    <p>@_uiState.KeyDefinition.PrefixLength</p>
+                    <ValidationMessage For="@(() => _uiState.KeyDefinition.PrefixLength)"/>
+                </div>
+                <div style="display: inline-block; width: 50%;">
+                    <input type="range" min="0" max="@(Math.Max(_uiState.KeyDefinition.KeyString.Length, 20))"
+                           @bind-value="@_uiState.KeyDefinition.SuffixLength" @bind-value:event="oninput"
+                           style="transform: scaleX(-1)"/>
+                    <p style="text-align: right;">@_uiState.KeyDefinition.SuffixLength</p>
+                    <ValidationMessage For="@(() => _uiState.KeyDefinition.SuffixLength)"/>
+                </div>
+            </div>
+        </div>
+        <div class="form-field">
             <label>Fragment Separator:</label>
             <div>
                 <InputText maxlength="1" @bind-Value="_uiState.KeyDefinition.SeparatorStr"/>

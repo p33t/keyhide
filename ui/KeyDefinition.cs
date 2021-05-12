@@ -15,12 +15,18 @@ namespace ui
             CustomCharset = source.CustomCharset;
             Prefix = source.Prefix;
             Suffix = source.Suffix;
+            PrefixLength = source.PrefixLength;
+            SuffixLength = source.SuffixLength;
         }
         [Required] public string KeyString { get; set; } = string.Empty;
 
         public string EffectiveKeyString => Separator == null
             ? KeyString
             : KeyString.Replace(SeparatorStr, "");
+        
+        public int PrefixLength { get; set; }
+        
+        public int SuffixLength { get; set; }
         
         public string SampleKeyStrings { get; set; } = string.Empty;
         public KeyCharSetEnum? CharSet { get; set; }
