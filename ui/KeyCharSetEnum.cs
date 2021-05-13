@@ -16,7 +16,7 @@ namespace ui
         AlphaNumericLower,
         AlphaNumeric,
         Base64,
-        ReadableSansSpace,
-        Readable
+        Visible,
+        VisibleWithSpace
     }
 }

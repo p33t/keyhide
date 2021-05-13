@@ -25,7 +25,7 @@ namespace ui
 
         private string ExtractBody(string keyString)
         {
-            return string.Join(null, keyString.Skip(PrefixLengthSafe).Reverse().Skip(SuffixLengthSafe).Reverse());
+            return keyString.Skip(PrefixLengthSafe).Reverse().Skip(SuffixLengthSafe).Reverse().AsString();
         }
 
         public string[] CompleteSampleBody =>
@@ -61,9 +61,9 @@ namespace ui
 
         public string? CustomCharset { get; set; }
 
-        public string Prefix => string.Join(null, KeyString.Take(PrefixLengthSafe));
+        public string Prefix => KeyString.Take(PrefixLengthSafe).AsString();
 
-        public string Suffix => string.Join(null, KeyString.Reverse().Take(SuffixLengthSafe).Reverse());
+        public string Suffix => KeyString.Reverse().Take(SuffixLengthSafe).Reverse().AsString();
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

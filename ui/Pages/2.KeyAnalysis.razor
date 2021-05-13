@@ -135,7 +135,7 @@
         {
             var chars = KeyAnalyzer.CharSetFor(_uiState.KeyDefinition.CharSet!.Value).ToList();
             chars.Sort();
-            _uiState.KeyDefinition.CustomCharset = string.Join(null, chars);
+            _uiState.KeyDefinition.CustomCharset = chars.AsString();
             _uiState.KeyDefinition.CharSet = null;
         }
     }

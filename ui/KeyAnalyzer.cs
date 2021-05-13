@@ -31,7 +31,7 @@ namespace ui
                 .FirstOrDefault(def => ValidateKeyDefinition(def).Count == 0) ?? new KeyDefinition // last resort
             {
                 KeyString = keyString,
-                CustomCharset = string.Join(null, new HashSet<char>(keyString))
+                CustomCharset = new HashSet<char>(keyString).AsString()
             };
         }
 
@@ -85,8 +85,8 @@ namespace ui
                 KeyCharSetEnum.AlphaNumericUpper => AlphaNumUpper,
                 KeyCharSetEnum.AlphaNumeric => AlphaNum,
                 KeyCharSetEnum.Base64 => string.Join(null, Digits, AlphabetLower, AlphabetUpper, "+/"),
-                KeyCharSetEnum.ReadableSansSpace => AlphaNumPunctSymbol,
-                KeyCharSetEnum.Readable => Readable,
+                KeyCharSetEnum.Visible => AlphaNumPunctSymbol,
+                KeyCharSetEnum.VisibleWithSpace => Readable,
                 _ => throw new ArgumentException($"Unrecognised option {charSetEnum}", nameof(charSetEnum))
             };
 
@@ -95,13 +95,13 @@ namespace ui
 
 
         private static readonly string Digits = string.Join(null, Enumerable.Range(0, 10));
-        private static readonly string AlphabetLower = string.Join(null, CharRange('a', 26));
+        private static readonly string AlphabetLower = CharRange('a', 26).AsString();
         private static readonly string AlphabetUpper = AlphabetLower.ToUpperInvariant();
         private static readonly string HexadecimalLower = Digits + string.Join(null, AlphabetLower.Take(6));
         private static readonly string HexadecimalUpper = HexadecimalLower.ToUpperInvariant();
         private static readonly string AlphaNumUpper = string.Join(null, Digits, AlphabetUpper);
         private static readonly string AlphaNum = string.Join(null, Digits, AlphabetLower, AlphabetUpper);
-        private static readonly string Readable = string.Join(null, CharRange(' ', 95));
+        private static readonly string Readable = CharRange(' ', 95).AsString();
         private static readonly string AlphaNumPunctSymbol = Sans(Readable, " ");
         // private const string Symbol = "$+<=>^`|~";
         // private static readonly string PunctSymbol = Sans(AlphaNumPunctSymbol, AlphaNum);
@@ -116,7 +116,7 @@ namespace ui
         {
             var chars = original.ToList();
             chars.RemoveAll(sans.Contains);
-            return string.Join(null, chars);
+            return chars.AsString();
         }
 
         public static FinalModel CreateFinalModel(PathDefinition pathDefinition, KeyDefinition keyDefinition,

@@ -39,7 +39,7 @@ namespace uiTest
         {
             foreach (var charSet in Enum.GetValues<KeyCharSetEnum>())
             {
-                _testOutputHelper.WriteLine($"{charSet}:\t{string.Join(null, KeyAnalyzer.CharSetFor(charSet))}");
+                _testOutputHelper.WriteLine($"{charSet}:\t{KeyAnalyzer.CharSetFor(charSet).AsString()}");
             }
 
             // 1Password Secret Key
