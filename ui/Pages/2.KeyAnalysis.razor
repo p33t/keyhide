@@ -10,7 +10,7 @@
 @* NOTE: IValidatableObject error checking only occurs upon submit *@
 <EditForm EditContext="@EditContext" OnValidSubmit="@NextScreen">
     <div class="form-fields">
-        <button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo("1"))">Back</button>
+        <button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo(""))">Back</button>
         <button type="button" class="next-button btn btn-warning" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
         <button type="submit" class="next-button btn btn-warning">Next</button>
         <div class="form-field">
