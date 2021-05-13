@@ -109,8 +109,7 @@
 
     private void Analyze()
     {
-        var altDef = KeyAnalyzer.AnalyzeKeyString(_uiState.KeyDefinition.KeyString);
-        _uiState.KeyDefinition.ReadFields(altDef);
+        KeyAnalyzer.AnalyzeKeyDefinition(_uiState.KeyDefinition);
         EditContext.Validate();
     }
 

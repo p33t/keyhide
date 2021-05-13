@@ -7,6 +7,28 @@ namespace uiTest
 {
     public class KeyAnalyzerTests
     {
+        [Theory]
+        [InlineData(0)]
+        [InlineData(0, "zzabc")]
+        [InlineData(2, "zzabc", "zzxyz")]
+        [InlineData(2, "zzabc", "zzabc", "zzxyz")]
+        public void DetectPrefixWorks(int expected, params string[] keyStrings)
+        {
+            var length = KeyAnalyzer.DetectPrefix(keyStrings);
+            Assert.Equal(expected, length);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(0, "abczz")]
+        [InlineData(2, "abczz", "xyzzz")]
+        [InlineData(2, "abczz", "abczz", "xyzzz")]
+        public void DetectSuffixWorks(int expected, params string[] keyStrings)
+        {
+            var length = KeyAnalyzer.DetectSuffix(keyStrings);
+            Assert.Equal(expected, length);
+        }
+        
         [Fact]
         public void CreateFinalModelWorks()
         {

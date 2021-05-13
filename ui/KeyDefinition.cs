@@ -28,13 +28,15 @@ namespace ui
             return keyString.Skip(PrefixLengthSafe).Reverse().Skip(SuffixLengthSafe).Reverse().AsString();
         }
 
-        public string[] CompleteSampleBody =>
+        public IEnumerable<string> CompleteSampleBody =>
+            CompleteSample
+                .Select(ExtractBody)
+                .Where(s => !string.IsNullOrEmpty(s));
+
+        public IEnumerable<string> CompleteSample =>
             SampleKeyStrings
                 .Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-                .Append(KeyString)
-                .Select(ExtractBody)
-                .Where(s => !string.IsNullOrEmpty(s))
-                .ToArray();
+                .Append(KeyString);
 
         public string EffectiveKeyString => Separator == null
             ? KeyStringBody

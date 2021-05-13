@@ -10,6 +10,44 @@ namespace ui
         private const string SpaceChars = " -_.";
 
         /// <summary>
+        /// Analyzes the given <code>KeyDefinition</code> for obvious fragments, prefix/suffix and preset character sets.
+        /// If no common ones are found then a 'custom' character set with no fragments is used.
+        /// </summary>
+        public static void AnalyzeKeyDefinition(KeyDefinition def)
+        {
+            var keyStrings = def.CompleteSample.ToArray();
+            def.PrefixLength = DetectPrefix(keyStrings);
+            def.SuffixLength = DetectSuffix(keyStrings);
+            var altDef = AnalyzeKeyString(string.Join(null, keyStrings));
+            def.Separator = altDef.Separator;
+            def.CharSet = altDef.CharSet;
+            def.CustomCharset = altDef.CustomCharset;
+        }
+
+        public static int DetectPrefix(string[] keyStrings)
+        {
+            if (keyStrings.Length < 2)
+                return 0;
+
+            var minLength = keyStrings.Min(s => s.Length);
+
+            var soFar = 0;
+            for (int i = 1; i <= minLength; i++)
+            {
+                var candidate = keyStrings[0].Take(i).AsString();
+                if (keyStrings.All(s => s.StartsWith(candidate)))
+                    soFar = i;
+                else
+                    break;
+            }
+
+            return soFar;
+        }
+
+        public static int DetectSuffix(string[] keyStrings) => 
+            DetectPrefix(keyStrings.Select(s => s.Reverse().AsString()).ToArray());
+
+        /// <summary>
         /// Analyzes the given string for obvious fragments and preset character sets to achieve a key definition.
         /// If no common ones are found then a 'custom' character set with no fragments is returned.
         /// </summary>
@@ -17,7 +55,7 @@ namespace ui
         {
             //////////////////////////////////////// Need to convert to 'raw key string' inside a KeyDefinition
             return Enum.GetValues<KeyCharSetEnum>()
-                .SelectMany(charSet => SpaceChars 
+                .SelectMany(charSet => SpaceChars
                     .Where(separator => !CharSetFor(charSet).Contains(separator))
                     .Select(ch => (char?) ch)
                     // no separator option
@@ -102,6 +140,7 @@ namespace ui
         private static readonly string AlphaNumUpper = string.Join(null, Digits, AlphabetUpper);
         private static readonly string AlphaNum = string.Join(null, Digits, AlphabetLower, AlphabetUpper);
         private static readonly string Readable = CharRange(' ', 95).AsString();
+
         private static readonly string AlphaNumPunctSymbol = Sans(Readable, " ");
         // private const string Symbol = "$+<=>^`|~";
         // private static readonly string PunctSymbol = Sans(AlphaNumPunctSymbol, AlphaNum);
