@@ -16,32 +16,40 @@
         <div class="form-field">
             <label>Key:</label>
             <div>
-                <InputText @bind-Value="_uiState.KeyDefinition.KeyString" minlength="1"/>
-                <button type="button" @onclick="Analyze">Analyze</button>
+                <InputText class="text-monospace" minlength="1"
+                           @bind-Value="_uiState.KeyDefinition.KeyString"/>
                 <ValidationMessage For="@(() => _uiState.KeyDefinition.KeyString)"/>
             </div>
         </div>
         <div class="form-field">
             <label>Sample Keys:</label>
             <div>
-                <InputTextArea @bind-Value="_uiState.KeyDefinition.SampleKeyStrings"></InputTextArea>
+                <InputTextArea class="text-monospace" style="width: 100%;"
+                               @bind-Value="_uiState.KeyDefinition.SampleKeyStrings"/>
                 <ValidationMessage For="@(() => _uiState.KeyDefinition.SampleKeyStrings)"/>
+                <button type="button" @onclick="Analyze">Analyze</button>
             </div>
         </div>
         <div class="form-field">
             <label>Prefix / Suffix:</label>
             <div style="display: flex;">
-                <div style="display: inline-block; width: 50%;">
-                    <input type="range" min="0" max="@(Math.Max(_uiState.KeyDefinition.KeyString.Length, 20))"
+                <div style="display: inline-block; width: 10em;">
+                    <input type="range" min="0" max="@MaxPrefixSuffixLength"
                            @bind-value="@_uiState.KeyDefinition.PrefixLength" @bind-value:event="oninput"/>
-                    <p>@_uiState.KeyDefinition.PrefixLength</p>
+                    <p>
+                        <span class="text-monospace">@_uiState.KeyDefinition.Prefix</span>
+                        (@_uiState.KeyDefinition.PrefixLength)
+                    </p>
                     <ValidationMessage For="@(() => _uiState.KeyDefinition.PrefixLength)"/>
                 </div>
-                <div style="display: inline-block; width: 50%;">
-                    <input type="range" min="0" max="@(Math.Max(_uiState.KeyDefinition.KeyString.Length, 20))"
+                <div style="display: inline-block; width: 10em;">
+                    <input type="range" min="0" max="@MaxPrefixSuffixLength"
                            @bind-value="@_uiState.KeyDefinition.SuffixLength" @bind-value:event="oninput"
                            style="transform: scaleX(-1)"/>
-                    <p style="text-align: right;">@_uiState.KeyDefinition.SuffixLength</p>
+                    <p style="text-align: right;">
+                        <span class="text-monospace">@_uiState.KeyDefinition.Suffix</span>
+                        (@_uiState.KeyDefinition.SuffixLength)
+                    </p>
                     <ValidationMessage For="@(() => _uiState.KeyDefinition.SuffixLength)"/>
                 </div>
             </div>
@@ -49,7 +57,8 @@
         <div class="form-field">
             <label>Fragment Separator:</label>
             <div>
-                <InputText maxlength="1" @bind-Value="_uiState.KeyDefinition.SeparatorStr"/>
+                <InputText class="text-monospace" style="width: 2em;" maxlength="1"
+                           @bind-Value="_uiState.KeyDefinition.SeparatorStr"/>
                 <ValidationMessage For="@(() => _uiState.KeyDefinition.Separator)"/>
             </div>
         </div>
@@ -70,7 +79,7 @@
         <div class="form-field">
             <label>Custom Characters:</label>
             <div>
-                <InputText @bind-Value="_uiState.KeyDefinition.CustomCharset"/>
+                <InputText class="text-monospace" @bind-Value="_uiState.KeyDefinition.CustomCharset"/>
                 <ValidationMessage For="@(() => _uiState.KeyDefinition.CustomCharset)"/>
             </div>
         </div>
@@ -90,6 +99,7 @@
     // || _uiState.KeyDefinition.Equals(_uiState.ValidKeyDefinition)
 
     private EditContext EditContext { get; set; } = null!;
+    private int MaxPrefixSuffixLength => Math.Max(_uiState.KeyDefinition.KeyString.Length * 2 / 3, 20);
 
     protected override void OnInitialized()
     {

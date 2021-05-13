@@ -1,25 +1,32 @@
 @using System.Collections.Immutable
-<table>
-    @foreach (var (ch, count) in IncludedTally)
-    {
-        <td>
-            <span class="@(count == 0 ? "tally-included-zero" : "tally-included" )">@ch</span><br/>
-            <span class="tally-count">@(count == 0 ? "-" : count.ToString())</span>
-        </td>
-    }
-</table>
 
-@if (ExtrasTally.Any())
-{
+<div class="form-field">
+    <label>Character Tally:</label>
     <table>
-        @foreach (var (ch, count) in ExtrasTally)
+        @foreach (var (ch, count) in IncludedTally)
         {
             <td>
-                <span class="tally-extra">@ch</span><br/>
-                <span class="tally-count">@count</span>
+                <span class="@(count == 0 ? "tally-included-zero" : "tally-included") text-monospace">@ch</span><br/>
+                <span class="tally-count">@(count == 0 ? "-" : count.ToString())</span>
             </td>
         }
     </table>
+</div>
+
+@if (ExtrasTally.Any())
+{
+    <div class="form-field">
+        <label>Extras:</label>
+        <table>
+            @foreach (var (ch, count) in ExtrasTally)
+            {
+                <td>
+                    <span class="tally-extra text-monospace">@ch</span><br/>
+                    <span class="tally-count">@count</span>
+                </td>
+            }
+        </table>
+    </div>
 }
 
 @code {
@@ -33,7 +40,7 @@
 
     [Parameter]
     public char? Separator { get; set; }
-    
+
     [Parameter]
     public ISet<char> CharSet { get; set; } = ImmutableHashSet<char>.Empty;
 

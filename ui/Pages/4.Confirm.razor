@@ -23,7 +23,7 @@
 @if (_uiState.FinalModel != null)
 {
     <button type="button" @onclick="@TogglePath">Show / Hide Path</button>
-    <table>
+    <table class="text-monospace">
         @for (var ixRow = 0; ixRow < _uiState.FinalModel.Grid.Length; ixRow++)
         {
             var row = _uiState.FinalModel.Grid[ixRow];

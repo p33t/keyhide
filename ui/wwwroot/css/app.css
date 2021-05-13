@@ -79,7 +79,6 @@ a, .btn-link {
 
 td.confirmCell, td.confirmCellHighlight {
     padding: 0 .1em 0 .1em;
-    font-family: monospace;
     font-weight: bold;
 }
 
