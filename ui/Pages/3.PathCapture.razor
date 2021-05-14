@@ -2,19 +2,19 @@
 @inject UiState _uiState
 @inject NavigationManager _navigationManager
 <h3>Path Setup</h3>
-<p>
-    Define how large your grid should be. Larger is more secure but also more difficult to display and use.
-</p>
-<p>
-    Then choose a series of cells that will define a path to inlay your key.
-</p>
-
 <EditForm EditContext="@EditContext" OnValidSubmit="@NextScreen">
+    <button type="button" class="next-button btn btn-warning" @onclick="NavBack">Back</button>
+    <button type="button" class="next-button btn btn-warning" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
+    <button type="submit" class="next-button btn btn-warning">Next</button>
+    <p>
+        &nbsp;<br/>
+        Define how large your grid should be. Larger is more secure but also more difficult to display and use.
+    </p>
+    <p>
+        Then choose a series of cells that will define a path to inlay your key.
+    </p>
     <div class="form-fields">
         <div>
-            <button type="button" class="next-button btn btn-warning" @onclick="NavBack">Back</button>
-            <button type="button" class="next-button btn btn-warning" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
-            <button type="submit" class="next-button btn btn-warning">Next</button>
         </div>
         <div class="form-field">
             <label>Columns:</label>

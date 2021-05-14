@@ -2,17 +2,18 @@
 @inject UiState _uiState
 @inject NavigationManager _navigationManager
 <h3>Key Analysis</h3>
-
-<p>
-    Enter the key that will be hidden among the grid of random characters and select 'Analyze'.
-    Confirm the parameters are correct before proceeding to next step.
-</p>
 @* NOTE: IValidatableObject error checking only occurs upon submit *@
 <EditForm EditContext="@EditContext" OnValidSubmit="@NextScreen">
+    <button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo(""))">Back</button>
+    <button type="button" class="next-button btn btn-warning" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
+    <button type="submit" class="next-button btn btn-warning">Next</button>
+    <p>
+        &nbsp;<br/>
+        Enter the key that will be hidden among the grid of random characters and select 'Analyze'.<br/>
+        For best results, enter additional key samples, 'Analyze' and then 'Customize' the master set of characters to remove unused characters.<br/>
+        Confirm the parameters are correct before proceeding to the next step.
+    </p>
     <div class="form-fields">
-        <button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo(""))">Back</button>
-        <button type="button" class="next-button btn btn-warning" @onclick="Undo" disabled="@UndoDisabled">Undo</button>
-        <button type="submit" class="next-button btn btn-warning">Next</button>
         <div class="form-field">
             <label>Key:</label>
             <div>

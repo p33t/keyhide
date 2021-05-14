@@ -2,16 +2,15 @@
 @inject UiState _uiState
 @inject NavigationManager _navigationManager
 <h3>Confirm</h3>
+<button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo("3"))">Back</button>
+<button type="button" class="next-button btn btn-warning" disabled="@RegenerateDisabled" @onclick="@Regenerate">Regenerate</button>
+<button type="button" class="next-button btn btn-warning" disabled="@RegenerateDisabled" @onclick="@(() => _navigationManager.NavigateTo("5"))">Next</button>
 <p>
+    &nbsp;<br/>
     Confirm the grid below adequately hides your key.
     If your key stands out you likely need to adjust the parameters in <NavLink href="2">Key Analysis</NavLink>.
     Regenerate the random characters if the current ones do not suit.
 </p>
-<button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo("3"))">Back</button>
-<button type="button" class="next-button btn btn-warning" disabled="@RegenerateDisabled" @onclick="@Regenerate">Regenerate</button>
-<button type="button" class="next-button btn btn-warning" disabled="@RegenerateDisabled" @onclick="@(() => _navigationManager.NavigateTo("5"))">Next</button>
-
-<p>&nbsp;</p>
 
 @if (_uiState.FinalModel == null)
 {
@@ -24,6 +23,7 @@
 {
     <button type="button" @onclick="@TogglePath">Show / Hide Path</button>
     <table class="text-monospace">
+        <tr @key=null><td colspan="@_uiState.ValidPathDefinition!.ColCount">&nbsp;</td></tr>
         @for (var ixRow = 0; ixRow < _uiState.FinalModel.Grid.Length; ixRow++)
         {
             var row = _uiState.FinalModel.Grid[ixRow];

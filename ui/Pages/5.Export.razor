@@ -7,11 +7,12 @@
 @using System.Text
 @using System.IO
 <h3>Export</h3>
+<button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo("4"))">Back</button>
 <p>
+    &nbsp;<br/>
     Trace the same path on the grid in this HTML file to reveal your secret key.<br/>
     (Don't forget to remove the ".txt" extension)
 </p>
-<button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo("4"))">Back</button>
 <p>&nbsp;</p>
 @if (ExportDisabled)
 {
@@ -20,7 +21,7 @@
 @if (!ExportDisabled)
 {
     <p>
-        <a download="@_fileName" href="@($"data:text/plain;base64,{_base64}")">Download</a> or
+        <a download="@_fileName" href="@($"data:text/plain;base64,{_base64}")">Export</a> or
         @* <a target="_blank" href="@($"data:text/html;base64,{_base64}")">Open in new tab</a> *@
         @* <a href="5" @onclick="@OpenNewTab">Open in new tab</a> *@
         <button type="button" @onclick="@OpenNewTab">Open in new tab</button>

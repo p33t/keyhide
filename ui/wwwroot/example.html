@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <title>Key Hide</title>
+    <style>
+        body {
+            background-color: linen;
+            font-family: sans-serif;
+        }
+        
+        td {
+            padding: .3em
+        }
+        
+        a {
+            text-decoration: none;
+        }
+        
+        .evenCell {
+            background-color: Gainsboro;
+        }
+        
+        .oddCell {
+            background-color: ghostwhite;
+        }
+    </style>    
+</head>
+<body>
+<h1>Key Hide</h1>
+<p>Select a series of cells from the grid to arrive at a secret key</p>
+<div>
+    <!--suppress HtmlFormInputWithoutLabel -->
+    <input type="text" hidden id="resultText" style="width: 30em" readonly="readonly" onclick="this.setSelectionRange(0, this.value.length)">
+    <input type="password" id="resultPassword" style="width: 30em" readonly="readonly">
+    <input type="button" id="showKey" value="Show/Hide" onclick="toggleShowKey(); return false;">
+    <input type="button" value="Copy + Reset" onclick="copy(); return false;">
+    <br>
+    <input type="button" name="reset" value="Reset" onclick="resetSelection(); return false;">
+    <input type="button" name="undo" value="Undo" onclick="undo(); return false;">
+</div>
+<p></p>
+<div id="grid-div"/>
+
+<script type="application/javascript">
+    let finalModel = {
+        FragmentCycles: [3,2,3],
+        FragmentSeparator: ".",
+        Prefix: "ABC.",
+        Suffix: ".XYZ",
+        Subtract: 2,
+        Grid: `
+aasdofiakjhk
+43l34;l4tlfk
+80feo89f9fad
+     `.trim().split('\n')
+    };
+    finalModel = {"Grid":["bqlzsjvntm","vhereiambh","ccswqwpudl","rkfboynypd","xhgwjnqwdb","rbodpoluby","nkboqpglor","pflmcsmhcz","pokpncpnoq","oibdmqtycb"],"Prefix":"","Suffix":"","Subtract":0,"FragmentCycles":[4,1],"FragmentSeparator":"-"};
+    const FRAGMENT_CYCLES = finalModel.FragmentCycles;
+    const SUBTRACT = finalModel.Subtract;
+    const SEPARATOR = finalModel.FragmentSeparator;
+    const PREFIX = finalModel.Prefix;
+    const SUFFIX = finalModel.Suffix;
+    const LINES = finalModel.Grid;
+    const selection = [];
+    document.body.onload = function () {
+        const lineLength = LINES[0].length;
+        const maxSide = Math.max(lineLength, LINES.length);
+        const boxSize = maxSide > 20 ? 3 : maxSide > 10 ? 2 : 1;
+        let grid = "<table style='text-align: center; border-collapse: collapse'>";
+        for (let ixLine = 0; ixLine < LINES.length; ixLine++) {
+            grid += "<tr>";
+            const line = LINES[ixLine];
+            if (line.length !== lineLength) throw new Error(`Line #${ixLine + 1} has ${line.length} elements.  Expected ${lineLength}`);
+            for (let ixChar = 0; ixChar < line.length; ixChar++) {
+                const char = line.charAt(ixChar);
+                const isOddCell = (Math.floor(ixLine / boxSize) % 2 + Math.floor(ixChar / boxSize) % 2) % 2 === 0;
+                grid += `<td class="${isOddCell ? 'oddCell' : 'evenCell'}">`;
+                let coordId = `${colName(ixChar + 1)}${ixLine + 1}`;
+                grid += `<a href='#' onclick='select(${ixLine}, ${ixChar}); return false;' title='${char}'>${coordId}</a>`;
+                grid += "</td>";
+            }
+            grid += "</tr>";
+        }
+        grid += "</table>";
+        document.getElementById("grid-div").innerHTML = grid;
+        syncDisplay();
+    };
+
+    /** Excel-like column names.  E.g. A,B..Z,AA,AB..AZ,BA..ZZ,AAA,AAB */
+    function colName(position) {
+        // 0 before A, but show Z instead of A0
+        if (position === 0) return '';
+        const mod = position % 26;
+        let digit = String.fromCharCode((mod) + '@'.charCodeAt(0));
+        let nextMagnitude = Math.floor(position / 26);
+        if (mod === 0) {
+            digit = 'Z';
+            nextMagnitude--;
+        }
+        return colName(nextMagnitude) + digit;
+    }
+
+    function select(ixLine, ixChar) {
+        selection.push([ixLine, ixChar]);
+        syncDisplay();
+    }
+
+    function resetSelection() {
+        selection.length = 0;
+        syncDisplay();
+    }
+
+    /** Remove the most recently added coordinate from the selection */
+    function undo() {
+        if (selection.length > 0) {
+            selection.length = selection.length - 1;
+            syncDisplay();
+        }
+    }
+
+    /** Return the char at the given coordinate */
+    function charAtCoord(coord) {
+        const line = LINES[coord[0]];
+        return line.charAt(coord[1]);
+    }
+
+    function copy() {
+        // NOTE: Can only copy from visible text input (not a password or hidden text)
+        //       Also cannot close a window with code that was opened manually
+        const resultText = document.getElementById("resultText");
+        const isHidden = resultText.hidden;
+        if (isHidden) resultText.hidden = false;
+        resultText.select();
+        resultText.setSelectionRange(0, resultText.value.length);
+        document.execCommand("copy");
+        if (isHidden) resultText.hidden = true;
+        resetSelection();
+    }
+    
+    function toggleShowKey() {
+        const resultText = document.getElementById("resultText");
+        const resultPassword = document.getElementById("resultPassword");
+        const isHidden = resultText.hidden;
+        resultText.hidden = !isHidden;
+        resultPassword.hidden = isHidden;
+    }
+    
+    /** Return the series of chars plotting a deterministic path 'direct' between the two given coords */
+    function trace(coordFrom, coordTo) {
+        const ixLine = stepCloser(coordFrom[0], coordTo[0]);
+        const ixChar = stepCloser(coordFrom[1], coordTo[1]);
+        const finished = ixLine === coordTo[0] && ixChar === coordTo[1];
+        const tail = finished ? charAtCoord(coordTo) : trace([ixLine, ixChar], coordTo);
+        return charAtCoord(coordFrom) + tail;
+    }
+
+    function stepCloser(from, to) {
+        if (from === to) return from;
+        if (from > to) return from - 1;
+        return from + 1;
+    }
+
+    function syncDisplay() {
+        let str = "";
+        let lastCoord;
+        for (const coord of selection) {
+            if (lastCoord) {
+                let leg = trace(lastCoord, coord);
+                str += leg.substring(1);
+            } else {
+                // the first coord
+                str = charAtCoord(coord);
+            }
+            lastCoord = coord;
+        }
+        str = str.substring(0, str.length - SUBTRACT);
+        
+        //  fragment cycles
+        if (FRAGMENT_CYCLES.length > 0) {
+            let ixFragment = 0;
+            let fragments = [];
+            let remaining = str;
+            while (remaining.length > 0) {
+                const fragmentSize = FRAGMENT_CYCLES[ixFragment];
+                fragments.push(remaining.substring(0, fragmentSize));
+                remaining = remaining.substring(fragmentSize);
+                ixFragment = (ixFragment + 1) % FRAGMENT_CYCLES.length;
+            }
+            str = fragments.join(SEPARATOR);
+        }
+        
+        
+        if (str.length > 1) str = PREFIX + str + SUFFIX;
+        const resultText = document.getElementById("resultText");
+        const resultPassword = document.getElementById("resultPassword");
+        resultText.value = str;
+        resultPassword.value = str;
+        // doesn't work
+        // txtResult.setSelectionRange(0, str.length);
+    }
+
+</script>
+
+</body></html>
