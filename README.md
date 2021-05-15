@@ -20,3 +20,10 @@ TODO
 ## Acknowledgements
 [Open Iconic](https://useiconic.com/open)
 TODO
+
+## Release Process
+- `dotnet publish -c Release`
+- Copy `.../publish/wwwroot/*` to github pages project
+- Rename '_framework' to 'framework'.  See [StackOverflow answer](https://stackoverflow.com/a/63007604/358006)
+
+TODO: Automate this
