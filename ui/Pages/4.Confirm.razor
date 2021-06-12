@@ -53,9 +53,14 @@
         _path.Clear();
         if (RegenerateDisabled)
             return;
-        
+
+        var pathLength = 0; 
         foreach (var cellCoord in PathOperations.Trace(_uiState.ValidPathDefinition!.Coords))
         {
+            pathLength++;
+            if (pathLength > _uiState.ValidKeyDefinition!.EffectiveKeyString.Length)
+                break;
+            
             _path.Add(cellCoord);
         }
         

@@ -94,18 +94,23 @@
             CellCoord? last = null;
             foreach (var coord in PathOperations.Trace(_uiState.PathDefinition.Coords))
             {
-                if (!remaining.Any() || !Grid.Contains(coord))
+                if (!Grid.Contains(coord))
                     break;
 
-                var ch = remaining[0];
-                remaining = remaining[1..];
-                Grid[coord] = new DisplayCell {Content = ch};
-                last = coord;
+                var cell = new DisplayCell{IsOnPath = true};
+                if (remaining.Any())
+                {
+                    var ch = remaining[0];
+                    remaining = remaining[1..];
+                    cell.Content = ch;
+                    last = coord;
+                }
+                Grid[coord] = cell;
             }
 
             foreach (var coord in Grid.AllCoords())
             {
-                var displayCell = Grid[coord] ?? DisplayCell.Default;
+                var displayCell = Grid[coord] ?? new DisplayCell();
                 var isAvailable = last == null || PathOperations.CoordIsAvailable(coord, c => Grid[c]?.Content, last, remaining);
                 if (isAvailable != displayCell.IsAvailable)
                 {
