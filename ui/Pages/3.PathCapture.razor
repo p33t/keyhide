@@ -17,7 +17,7 @@
         <div>
         </div>
         <div class="form-field">
-            <label>Columns:</label>
+            <label><span class="oi oi-resize-width" aria-hidden="true"></span> Cols:</label>
             <div>
                 @* Can't bind value and listen for change *@
                 @* <InputNumber @bind-Value="_uiState.GridSetup.ColCount" @OnChange="ColCountChange"/> *@
@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="form-field">
-            <label>Rows:</label>
+            <label><span class="oi oi-resize-height" aria-hidden="true"></span> Rows:</label>
             <div>
                 <input type="number" style="width: 4em;" min="@PathDefinition.MinCount" max="@PathDefinition.MaxCount"
                        value="@(_uiState.PathDefinition.RowCount)" @onchange="RowCountChange"/>
