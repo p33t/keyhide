@@ -97,7 +97,13 @@
                 if (!Grid.Contains(coord))
                     break;
 
-                var cell = new DisplayCell{IsOnPath = true};
+                var cell = Grid[coord];
+                if (cell == null)
+                {
+                    cell = new DisplayCell{ IsOnPath = true };
+                    Grid[coord] = cell;
+                }
+                
                 if (remaining.Any())
                 {
                     var ch = remaining[0];
@@ -105,7 +111,6 @@
                     cell.Content = ch;
                     last = coord;
                 }
-                Grid[coord] = cell;
             }
 
             foreach (var coord in Grid.AllCoords())
