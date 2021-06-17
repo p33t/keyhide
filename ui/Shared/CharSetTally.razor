@@ -6,8 +6,19 @@
         @foreach (var (ch, count) in IncludedTally)
         {
             <td>
-                <span class="@(count == 0 ? "tally-included-zero" : "tally-included") text-monospace">@ch</span><br/>
-                <span class="tally-count">@(count == 0 ? "-" : count.ToString())</span>
+                @if (count == 0)
+                {
+                <a href='' @onclick="() => RemoveUnused(ch)" @onclick:preventDefault>
+                    <span class="tally-included-zero text-monospace" title="Click to remove">@ch</span>
+                </a>
+                <br/>
+                <span class="tally-count">-</span>
+                }
+                @if (count > 0)
+                {
+                    <span class="tally-included text-monospace">@ch</span><br/>
+                    <span class="tally-count">@count</span>
+                }
             </td>
         }
     </table>
@@ -21,7 +32,10 @@
             @foreach (var (ch, count) in ExtrasTally)
             {
                 <td>
-                    <span class="tally-extra text-monospace">@ch</span><br/>
+                <a href='' @onclick="() => AddMissing(ch)" @onclick:preventDefault>
+                    <span class="tally-extra text-monospace">@ch</span>
+                </a>
+                <br/>
                     <span class="tally-count">@count</span>
                 </td>
             }
@@ -30,7 +44,12 @@
 }
 
 @code {
+    [Parameter]
+    public EventCallback<char> RemoveUnusedChar { get; set; }
 
+    [Parameter]
+    public EventCallback<char> AddMissingChar { get; set; }
+    
     private List<(char, int)> IncludedTally { get; set; } = new List<(char, int)>();
 
     private List<(char, int)> ExtrasTally { get; set; } = new List<(char, int)>();
@@ -69,4 +88,13 @@
         base.OnParametersSet();
     }
 
+    private async Task RemoveUnused(char ch)
+    {
+        await RemoveUnusedChar.InvokeAsync(ch);
+    }
+
+    private async Task AddMissing(char ch)
+    {
+        await AddMissingChar.InvokeAsync(ch);
+    }
 }

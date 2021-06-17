@@ -89,7 +89,8 @@
     <CharSetTally
         KeyStrings="@(string.Join(null, _uiState.KeyDefinition.CompleteSampleBody))"
         Separator="@_uiState.KeyDefinition.Separator"
-        CharSet="@(_uiState.KeyDefinition.CharSet == null ? (_uiState.KeyDefinition.CustomCharset ?? "").ToHashSet() : KeyAnalyzer.CharSetFor(_uiState.KeyDefinition.CharSet!.Value))"/>
+        CharSet="@(_uiState.KeyDefinition.CharSet == null ? (_uiState.KeyDefinition.CustomCharset ?? "").ToHashSet() : KeyAnalyzer.CharSetFor(_uiState.KeyDefinition.CharSet!.Value))"
+        RemoveUnusedChar="RemoveUnused" AddMissingChar="AddMissing"/>
 </EditForm>
 
 @code {
@@ -140,4 +141,17 @@
         }
     }
 
+    private void RemoveUnused(char unused)
+    {
+        Customize();
+        var alt = _uiState.KeyDefinition.CustomCharset!.Where(ch => ch != unused).AsString();
+        _uiState.KeyDefinition.CustomCharset = alt;
+    }
+    
+    private void AddMissing(char missing)
+    {
+        Customize();
+        var alt = _uiState.KeyDefinition.CustomCharset! + missing;
+        _uiState.KeyDefinition.CustomCharset = alt;
+    }
 }
