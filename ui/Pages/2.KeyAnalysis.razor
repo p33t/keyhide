@@ -17,16 +17,16 @@
         <div class="form-field">
             <label>Key:</label>
             <div>
-                <InputText class="text-monospace" minlength="1"
-                           @bind-Value="_uiState.KeyDefinition.KeyString"/>
+                <input type="text" class="text-monospace" minlength="1"
+                       @bind-value="@_uiState.KeyDefinition.KeyString" @bind-value:event="oninput"/>
                 <ValidationMessage For="@(() => _uiState.KeyDefinition.KeyString)"/>
             </div>
         </div>
         <div class="form-field">
             <label>Sample Keys:</label>
             <div>
-                <InputTextArea class="text-monospace" style="width: 100%;"
-                               @bind-Value="_uiState.KeyDefinition.SampleKeyStrings"/>
+                <textarea class="text-monospace" style="width: 100%;"
+                       @bind-value="@_uiState.KeyDefinition.SampleKeyStrings" @bind-value:event="oninput"></textarea>
                 <ValidationMessage For="@(() => _uiState.KeyDefinition.SampleKeyStrings)"/>
                 <button type="button" @onclick="Analyze">Analyze</button>
             </div>
@@ -51,8 +51,17 @@
         <div class="form-field">
             <label>Fragment Separator:</label>
             <div>
-                <InputText class="text-monospace" style="width: 2em;" maxlength="1"
-                           @bind-Value="_uiState.KeyDefinition.SeparatorStr"/>
+                <input type="text" class="text-monospace" style="width: 2em;" maxlength="1"
+                       onclick="this.setSelectionRange(0, this.value.length)"
+                       @bind-value="@_uiState.KeyDefinition.SeparatorStr" @bind-value:event="oninput"/>
+                @if (_uiState.KeyDefinition.Separator == null)
+                {
+                    <span> (none)</span>
+                }
+                @if (_uiState.KeyDefinition.Separator == ' ')
+                {
+                    <span> (space)</span>
+                }
                 <ValidationMessage For="@(() => _uiState.KeyDefinition.Separator)"/>
             </div>
         </div>
