@@ -102,6 +102,10 @@ td.occupied, td.confirmCellHighlight {
     background-color: lightskyblue;
 }
 
+td.padding {
+    background-color: #CEFAFF82;
+}
+
 td.available a {
     color: forestgreen;
     font-weight: bold;

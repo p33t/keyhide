@@ -13,43 +13,47 @@
     <p>
         Then choose a series of cells that will define a path to inlay your key.
     </p>
-    <div class="form-fields">
-        <div>
-        </div>
-        <div class="form-field">
-            <label>Columns:</label>
+    <div style="display: flex;">
+        <div class="form-fields" style="display: inline-block;">
             <div>
-                @* Can't bind value and listen for change *@
-                @* <InputNumber @bind-Value="_uiState.GridSetup.ColCount" @OnChange="ColCountChange"/> *@
-                <input type="number" style="width: 4em;" min="@PathDefinition.MinCount" max="@PathDefinition.MaxCount"
-                       value="@(_uiState.PathDefinition.ColCount)" @onchange="ColCountChange"/>
-                <ValidationMessage For="@(() => _uiState.PathDefinition.ColCount)"/>
+            </div>
+            <div class="form-field">
+                <label><span class="oi oi-resize-width" aria-hidden="true"></span> Cols:</label>
+                <div>
+                    @* Can't bind value and listen for change *@
+                    @* <InputNumber @bind-Value="_uiState.GridSetup.ColCount" @OnChange="ColCountChange"/> *@
+                    <input type="number" style="width: 4em;" min="@PathDefinition.MinCount" max="@PathDefinition.MaxCount"
+                           value="@(_uiState.PathDefinition.ColCount)" @onchange="ColCountChange"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label><span class="oi oi-resize-height" aria-hidden="true"></span> Rows:</label>
+                <div>
+                    <input type="number" style="width: 4em;" min="@PathDefinition.MinCount" max="@PathDefinition.MaxCount"
+                           value="@(_uiState.PathDefinition.RowCount)" @onchange="RowCountChange"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Path:</label>
+                <div>
+                    @if (_uiState.PathDefinition.Coords.Any())
+                    {
+                        @(string.Join(' ', _uiState.PathDefinition.Coords))<br/>
+                    }
+                    else
+                    {
+                        <text>(Empty)</text>
+                        <br/>
+                    }
+                    <button type="button" @onclick="Reset">Reset</button>
+                    <button type="button" @onclick="UndoLeg">Undo</button>
+                </div>
             </div>
         </div>
-        <div class="form-field">
-            <label>Rows:</label>
-            <div>
-                <input type="number" style="width: 4em;" min="@PathDefinition.MinCount" max="@PathDefinition.MaxCount"
-                       value="@(_uiState.PathDefinition.RowCount)" @onchange="RowCountChange"/>
-                <ValidationMessage For="@(() => _uiState.PathDefinition.RowCount)"/>
-            </div>
-        </div>
-        <div class="form-field">
-            <label>Path:</label>
-            <div>
-                @if (_uiState.PathDefinition.Coords.Any())
-                {
-                    @(string.Join(' ', _uiState.PathDefinition.Coords))<br/>
-                }
-                else
-                {
-                    <text>(Empty)</text>
-                    <br/>
-                }
-                <button type="button" @onclick="Reset">Reset</button>
-                <button type="button" @onclick="UndoLeg">Undo</button>
-                <ValidationMessage For="@(() => _uiState.PathDefinition.Coords)"/>
-            </div>
+        <div style="display: inline-block;">
+            <ValidationMessage For="@(() => _uiState.PathDefinition.ColCount)"/>
+            <ValidationMessage For="@(() => _uiState.PathDefinition.RowCount)"/>
+            <ValidationMessage For="@(() => _uiState.PathDefinition.Coords)"/>
         </div>
     </div>
     <DataAnnotationsValidator/>
@@ -89,23 +93,33 @@
     {
         if (_uiState.PathDefinition.EffectiveKeyString != null)
         {
-            Grid.Reset();
+            ResetGrid();
             var remaining = _uiState.PathDefinition.EffectiveKeyString;
             CellCoord? last = null;
             foreach (var coord in PathOperations.Trace(_uiState.PathDefinition.Coords))
             {
-                if (!remaining.Any() || !Grid.Contains(coord))
+                if (!Grid.Contains(coord))
                     break;
 
-                var ch = remaining[0];
-                remaining = remaining[1..];
-                Grid[coord] = new DisplayCell {Content = ch};
-                last = coord;
+                var cell = Grid[coord];
+                if (cell == null)
+                {
+                    cell = new DisplayCell {IsOnPath = true};
+                    Grid[coord] = cell;
+                }
+
+                if (remaining.Any())
+                {
+                    var ch = remaining[0];
+                    remaining = remaining[1..];
+                    cell.Content = ch;
+                    last = coord;
+                }
             }
 
             foreach (var coord in Grid.AllCoords())
             {
-                var displayCell = Grid[coord] ?? DisplayCell.Default;
+                var displayCell = Grid[coord] ?? new DisplayCell();
                 var isAvailable = last == null || PathOperations.CoordIsAvailable(coord, c => Grid[c]?.Content, last, remaining);
                 if (isAvailable != displayCell.IsAvailable)
                 {
@@ -114,6 +128,17 @@
             }
         }
         EditContext.Validate();
+    }
+
+    private void ResetGrid()
+    {
+        int SafeCount(int i) => Math.Max(Math.Min(i, PathDefinition.MaxCount), PathDefinition.MinCount);
+        var colCount = SafeCount(_uiState.PathDefinition.ColCount);
+        var rowCount = SafeCount(_uiState.PathDefinition.RowCount);
+        if (Grid.ColCount != colCount || Grid.RowCount != rowCount)
+            Grid = new CoordGrid<DisplayCell>(colCount, rowCount);
+        else
+            Grid.Reset();
     }
 
     private void UndoLeg()
@@ -128,11 +153,9 @@
 
     private void Reset()
     {
-        int SafeCount(int i) => Math.Max(Math.Min(i, PathDefinition.MaxCount), PathDefinition.MinCount);
-        var colCount = SafeCount(_uiState.PathDefinition.ColCount);
-        var rowCount = SafeCount(_uiState.PathDefinition.RowCount);
-        Grid = new CoordGrid<DisplayCell>(colCount, rowCount);
+        ResetGrid();
         _uiState.PathDefinition.Coords = Enumerable.Empty<CellCoord>();
+        EditContext.Validate();
     }
 
     private void NextScreen()
@@ -147,17 +170,15 @@
         {
             _uiState.PathDefinition.ColCount = colCount;
             Reset();
-            EditContext.Validate();
         }
     }
 
     private void RowCountChange(ChangeEventArgs evt)
     {
-        if (int.TryParse((string) evt.Value!, out var colCount) && _uiState.PathDefinition.RowCount != colCount)
+        if (int.TryParse((string) evt.Value!, out var rowCount) && _uiState.PathDefinition.RowCount != rowCount)
         {
-            _uiState.PathDefinition.RowCount = colCount;
+            _uiState.PathDefinition.RowCount = rowCount;
             Reset();
-            EditContext.Validate();
         }
     }
 
