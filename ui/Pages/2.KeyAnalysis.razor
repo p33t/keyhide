@@ -35,22 +35,15 @@
             <label>Prefix / Suffix:</label>
             <div style="display: flex;">
                 <div style="display: inline-block; width: 10em;">
-                    <input type="range" min="0" max="@MaxPrefixSuffixLength"
-                           @bind-value="@_uiState.KeyDefinition.PrefixLength" @bind-value:event="oninput"/>
-                    <p>
-                        <span class="text-monospace">@_uiState.KeyDefinition.Prefix</span>
-                        (@_uiState.KeyDefinition.PrefixLength)
-                    </p>
+                    <InputNumber style="width: 3em;" @bind-Value="_uiState.KeyDefinition.PrefixLength" 
+                                 min="0" max="@MaxPrefixSuffixLength"/>
+                    <span class="text-monospace">@_uiState.KeyDefinition.Prefix</span>
                     <ValidationMessage For="@(() => _uiState.KeyDefinition.PrefixLength)"/>
                 </div>
-                <div style="display: inline-block; width: 10em;">
-                    <input type="range" min="0" max="@MaxPrefixSuffixLength"
-                           @bind-value="@_uiState.KeyDefinition.SuffixLength" @bind-value:event="oninput"
-                           style="transform: scaleX(-1)"/>
-                    <p style="text-align: right;">
-                        <span class="text-monospace">@_uiState.KeyDefinition.Suffix</span>
-                        (@_uiState.KeyDefinition.SuffixLength)
-                    </p>
+                <div style="display: inline-block; width: 10em; text-align: end">
+                    <span class="text-monospace">@_uiState.KeyDefinition.Suffix</span>
+                    <InputNumber style="width: 3em;" @bind-Value="_uiState.KeyDefinition.SuffixLength" 
+                                 min="0" max="@MaxPrefixSuffixLength"/>
                     <ValidationMessage For="@(() => _uiState.KeyDefinition.SuffixLength)"/>
                 </div>
             </div>
