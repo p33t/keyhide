@@ -3,13 +3,17 @@ A tool for generating a key hide HTML file
 
 **This application can be used online at: https://keyhidegen.freshcode.biz**
 
+**DISCLAIMER: Use this software at your own risk. The author offers no warranty and makes no claims regarding the
+effectiveness of the resulting key hide or the use of any key hide in protecting sensitive information.**
+
 ## Background
 Sometimes you need to reproduce a series of random characters or 'key' but you don't want to write it down, and you can't remember it.
 A 'key hide' contains the key but you need to know the coordinates to extract it.
 
 This is similar to a physical [key lock box](https://www.google.com/search?q=key+lock+box&tbm=isch).
 
-Try out a [simple example key hide](https://keyhidegen.freshcode.biz/example.html) (Click B2 then H2).  
+Try out a [simple example key hide](https://keyhidegen.freshcode.biz/example.html) (Click B2 then H2).
+Or watch a [demonstration video](https://youtu.be/CL3XHqsjiiM) online.
 
 ## Screenshots
 ### Example Key Hide

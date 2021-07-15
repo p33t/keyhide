@@ -4,7 +4,10 @@
 <button type="button" class="next-button btn btn-warning" @onclick="@(() => _navigationManager.NavigateTo("2"))">Next</button>
 <p>
     &nbsp;<br/>
-    This online tool will produce a grid of random characters which contains a secret string of characters, or <b>key</b>.
+    <Disclaimer/>
+</p>
+<p>
+    This online tool will produce a grid of pseudo-random characters which contains a secret string of characters, or <b>key</b>.
     The key can be retrieved by tracing a sequence of known coordinates within the grid.
 </p>
 <p>
@@ -17,4 +20,10 @@
 <p>
     For security purposes, <b>your secret key never leaves this computer</b>.
     Feel free to disconnect network access while using this tool.
+</p>
+<p>
+    <a href="https://youtu.be/CL3XHqsjiiM">Demonstration</a>:<br/>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/CL3XHqsjiiM" title="YouTube video player"
+            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
 </p>
