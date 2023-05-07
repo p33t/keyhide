@@ -43,6 +43,5 @@ Click to [open](https://keyhidegen.freshcode.biz/example.html) (And click B2 the
 ## Release Process
 - `dotnet publish -c Release`
 - Copy `.../publish/wwwroot/*` to github pages project
-- Rename '_framework' to 'framework'.  See [StackOverflow answer](https://stackoverflow.com/a/63007604/358006)
 
 TODO: Automate this
