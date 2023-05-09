@@ -41,7 +41,11 @@ Click to [open](https://keyhidegen.freshcode.biz/example.html) (And click B2 the
 [GitHub](https://github.com/) - For [project](https://github.com/p33t/keyhidegen) and [webpage](https://github.com/p33t/keyhidegen.freshcode.biz) hosting
 
 ## Release Process
+- `cd ui`
+- `rm -rf bin/Release/net6.0/publish/`
 - `dotnet publish -c Release`
 - Copy `.../publish/wwwroot/*` to github pages project
+- Make sure the checkout of the pages project has `autocrlf` disabled otherwise the integrity checks will fail
+  - i.e. `git config core.autocrlf false` 
 
 TODO: Automate this
